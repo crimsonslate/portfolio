@@ -10,4 +10,7 @@ migrations/
 # Virtual environments
 .venv
 .env
+
+# Other
 .python-version
+db.*
