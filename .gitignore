@@ -9,9 +9,9 @@ migrations/
 
 # Virtual environments
 .venv
-.env
+venv
 
 # Other
 .python-version
+.env
 db.*
-crimsonslate_portfolio.egg-info/
