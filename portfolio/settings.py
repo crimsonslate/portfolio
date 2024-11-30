@@ -8,7 +8,7 @@ INTERNAL_IPS = ["127.0.0.1", "0.0.0.0"]
 LANGUAGE_CODE = "en-us"
 MEDIA_ROOT = BASE_DIR / "media/"
 MEDIA_URL = "media/"
-ROOT_URLCONF = "site.urls"
+ROOT_URLCONF = "portfolio.urls"
 SECRET_KEY = "django-insecure-#ezlo7tqc&h07y4g^1i3jqg78^z*jgsyd11kq812^=k4%!lk6b"
 STATIC_ROOT = "/static/"
 STATIC_URL = "static/"
@@ -17,30 +17,50 @@ TAILWIND_APP_NAME = "theme"
 TIME_ZONE = "America/Chicago"
 USE_I18N = True
 USE_TZ = True
-WSGI_APPLICATION = "site.wsgi.application"
+WSGI_APPLICATION = "portfolio.wsgi.application"
 
 PORTFOLIO_PROFILE = {
-    "NAME": "Bryce Nall",
-    "FIRST_NAME": "Bryce",
-    "LAST_NAME": "Nall",
-    "EMAIL": "btn04@gmail.com",
-    "PHONE": None,
+    "NAME": "Crimsonslate",
+    "FIRST_NAME": "Crimson",
+    "LAST_NAME": "Slate",
+    "EMAIL": "contact@crimsonslate.com",
+    "PHONE": "+15555555555",
     "SOCIALS": {
-        "DISCORD": None,
+        "DISCORD": {
+            "display_name": "crimsonslate",
+            "profile_link": "https://discord.gg/***",  # Server link
+            "username": "crimsonslate",
+        },
         "YOUTUBE": {
-            "display_name": "Bryce Nall",
-            "profile_link": "https://www.youtube.com/@brycenall7439/",
-            "username": "brycenall7439",
+            "display_name": "crimsonslate",
+            "profile_link": "https://youtube.com/***",
+            "username": "crimsonslate",
         },
         "INSTAGRAM": {
-            "display_name": "bryce nall",
-            "profile_link": "https://www.instagram.com/bybnall/",
-            "username": "bybnall",
+            "display_name": "crimsonslate",
+            "profile_link": "https://instagram.com/@***",
+            "username": "crimsonslate",
         },
-        "FACEBOOK": None,
-        "TIKTOK": None,
-        "TWITTER": None,
-        "REDDIT": None,
+        "FACEBOOK": {
+            "display_name": "crimsonslate",
+            "profile_link": "https://facebook.com/***",
+            "username": "crimsonslate",
+        },
+        "TIKTOK": {
+            "display_name": "crimsonslate",
+            "profile_link": "https://facebook.com/***",
+            "username": "crimsonslate",
+        },
+        "TWITTER": {
+            "display_name": "crimsonslate",
+            "profile_link": "https://x.com/@***",
+            "username": "crimsonslate",
+        },
+        "REDDIT": {
+            "display_name": "crimsonslate",
+            "profile_link": "https://reddit.com/u/***",
+            "username": "crimsonslate",
+        },
     },
 }
 
@@ -71,10 +91,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.forms",
-    "theme",
-    "django_browser_reload",
-    "tailwind",
-    "django_htmx",
     "crimsonslate_portfolio.apps.CrimsonslatePortfolioConfig",
 ]
 
@@ -86,8 +102,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "django_browser_reload.middleware.BrowserReloadMiddleware",
-    "django_htmx.middleware.HtmxMiddleware",
 ]
 
 
