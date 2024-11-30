@@ -146,10 +146,12 @@ dependencies = [
     { name = "asgiref" },
     { name = "binaryornot" },
     { name = "certifi" },
+    { name = "chardet" },
     { name = "charset-normalizer" },
     { name = "click" },
     { name = "cookiecutter" },
     { name = "django" },
+    { name = "django-browser-reload" },
     { name = "django-htmx" },
     { name = "django-tailwind" },
     { name = "idna" },
@@ -185,10 +187,12 @@ requires-dist = [
     { name = "asgiref", specifier = ">=3.8.1" },
     { name = "binaryornot", specifier = ">=0.4.4" },
     { name = "certifi", specifier = ">=2024.8.30" },
+    { name = "chardet", specifier = ">=5.2.0" },
     { name = "charset-normalizer", specifier = ">=3.4.0" },
     { name = "click", specifier = ">=8.1.7" },
     { name = "cookiecutter", specifier = ">=2.6.0" },
     { name = "django", specifier = ">=5.1.3" },
+    { name = "django-browser-reload", specifier = ">=1.17.0" },
     { name = "django-browser-reload", marker = "extra == 'dev-tools'", specifier = ">=1.17.0" },
     { name = "django-htmx", specifier = ">=1.21.0" },
     { name = "django-tailwind", specifier = ">=3.8.0" },
@@ -398,7 +402,7 @@ name = "opencv-python"
 version = "4.10.0.84"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4a/e7/b70a2d9ab205110d715906fc8ec83fbb00404aeb3a37a0654fdb68eb0c8c/opencv-python-4.10.0.84.tar.gz", hash = "sha256:72d234e4582e9658ffea8e9cae5b63d488ad06994ef12d81dc303b17472f3526", size = 95103981 }
 wheels = [

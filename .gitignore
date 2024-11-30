@@ -14,3 +14,4 @@ migrations/
 # Other
 .python-version
 db.*
+crimsonslate_portfolio.egg-info/
