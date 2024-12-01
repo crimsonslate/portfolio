@@ -15,7 +15,7 @@ from django.views.generic import (
     FormView,
 )
 
-from crimsonslate_portfolio.models import Media
+from crimsonslate_portfolio.models import Media, MediaCategory
 from crimsonslate_portfolio.forms import (
     MediaSearchForm,
     MediaUploadForm,
@@ -118,9 +118,13 @@ class PortfolioSearchView(TemplateView, FormView):
 
     def form_valid(self, form: MediaSearchForm) -> HttpResponse:
         results: QuerySet[Media, Media | None] = Media.objects.filter(
-            Q(title__iexact=form.cleaned_data["search"])
-            | Q(title__contains=form.cleaned_data["search"])
+            Q(title__iexact=form.cleaned_data["title"])
+            | Q(title__contains=form.cleaned_data["title"]),
         ).order_by("-date_created")
+
+        if form.cleaned_data["categories"]:
+            categories: list[int] = form.cleaned_data["categories"]
+            results = results.filter(categories=categories)
         context: dict[str, Any] = self.get_context_data(results=results)
         return self.render_to_response(context=context)
 
@@ -148,14 +152,10 @@ class PortfolioUploadView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form: MediaUploadForm) -> HttpResponseRedirect:
         media = Media.objects.create(
+            source=form.cleaned_data["source"],
+            thumb=form.cleaned_data["thumb"],
             title=form.cleaned_data["title"],
             subtitle=form.cleaned_data["subtitle"],
             desc=form.cleaned_data["desc"],
-            source=form.cleaned_data["source"],
         )
-        if form.cleaned_data["subtitle"]:
-            media.subtitle = form.cleaned_data["subtitle"]
-        if form.cleaned_data["thumb"]:
-            media.thumb = form.cleaned_data["thumb"]
-        media.save()
         return HttpResponseRedirect(self.get_success_url(media))
