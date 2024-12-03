@@ -8,6 +8,7 @@ asgiref==3.8.1
     # via
     #   crimsonslate-portfolio (pyproject.toml)
     #   django
+    #   django-browser-reload
 binaryornot==0.4.4
     # via
     #   crimsonslate-portfolio (pyproject.toml)
@@ -31,6 +32,13 @@ click==8.1.7
 cookiecutter==2.6.0
     # via crimsonslate-portfolio (pyproject.toml)
 django==5.1.3
+    # via
+    #   crimsonslate-portfolio (pyproject.toml)
+    #   django-browser-reload
+    #   django-tailwind
+django-browser-reload==1.17.0
+    # via django-tailwind
+django-tailwind==3.8.0
     # via crimsonslate-portfolio (pyproject.toml)
 idna==3.10
     # via
