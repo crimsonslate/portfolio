@@ -18,6 +18,7 @@ TIME_ZONE = "America/Chicago"
 USE_I18N = True
 USE_TZ = True
 WSGI_APPLICATION = "portfolio.wsgi.application"
+SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
 PORTFOLIO_PROFILE = {
     "NAME": "Crimsonslate",
@@ -91,6 +92,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.forms",
+    "tailwind",
+    "theme",
     "crimsonslate_portfolio.apps.CrimsonslatePortfolioConfig",
 ]
 
