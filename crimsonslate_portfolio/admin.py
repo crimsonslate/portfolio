@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Media, MediaCategory
+
+admin.site.register(Media)
+admin.site.register(MediaCategory)

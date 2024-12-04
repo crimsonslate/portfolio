@@ -1,11 +1,6 @@
-from django.contrib.auth.forms import AuthenticationForm
 from django.forms import ModelForm
 
 from crimsonslate_portfolio.models import Media
-
-
-class PortfolioAuthenticationForm(AuthenticationForm):
-    """A basic authentication form."""
 
 
 class MediaUploadForm(ModelForm):

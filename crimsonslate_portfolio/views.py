@@ -15,11 +15,10 @@ from django.views.generic import (
     FormView,
 )
 
-from crimsonslate_portfolio.models import Media, MediaCategory
+from crimsonslate_portfolio.models import Media
 from crimsonslate_portfolio.forms import (
     MediaSearchForm,
     MediaUploadForm,
-    PortfolioAuthenticationForm,
 )
 
 
@@ -67,30 +66,14 @@ class MediaDeleteView(LoginRequiredMixin, DeleteView):
         return context
 
 
-class PortfolioLoginView(LoginView):
-    authentication_form = PortfolioAuthenticationForm
-    content_type = "text/html"
-    extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Login"}
-    http_method_names = ["get", "post"]
-    template_name = "portfolio/login.html"
-
-
-class PortfolioLogoutView(LogoutView):
-    content_type = "text/html"
-    extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Logout"}
-    http_method_names = ["get", "post"]
-    success_url_allowed_hosts = settings.ALLOWED_HOSTS
-    template_name = "portfolio/logout.html"
-
-
-class PortfolioContactView(TemplateView):
+class ContactView(TemplateView):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Contact"}
     http_method_names = ["get", "post"]
     template_name = "portfolio/contact.html"
 
 
-class PortfolioGalleryView(ListView):
+class GalleryView(ListView):
     content_type = "text/html"
     context_object_name = "medias"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Gallery"}
@@ -102,41 +85,22 @@ class PortfolioGalleryView(ListView):
     template_name = "portfolio/gallery.html"
 
 
-class PortfolioSearchView(TemplateView, FormView):
+class SearchView(TemplateView, FormView):
     context_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Search"}
     http_method_names = ["get", "post"]
     template_name = "portfolio/search.html"
-    partial_template_name = "portfolio/search_results.html"
     form_class = MediaSearchForm
     success_url = reverse_lazy("portfolio search")
 
-    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if request.headers.get("HX-Request"):
-            self.template_name = self.partial_template_name
-        return super().post(request, *args, **kwargs)
 
-    def form_valid(self, form: MediaSearchForm) -> HttpResponse:
-        results: QuerySet[Media, Media | None] = Media.objects.filter(
-            Q(title__iexact=form.cleaned_data["title"])
-            | Q(title__contains=form.cleaned_data["title"]),
-        ).order_by("-date_created")
-
-        if form.cleaned_data["categories"]:
-            categories: list[int] = form.cleaned_data["categories"]
-            results = results.filter(categories=categories)
-        context: dict[str, Any] = self.get_context_data(results=results)
-        return self.render_to_response(context=context)
-
-    def get_context_data(
-        self, results: QuerySet[Media, Media | None] | None = None, **kwargs
-    ) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["results"] = results
-        return context
+class SearchResultsView(TemplateView):
+    context_type = "text/html"
+    http_method_names = ["get"]
+    template_name = "portfolio/search_results.html"
 
 
-class PortfolioUploadView(LoginRequiredMixin, FormView):
+class UploadView(LoginRequiredMixin, FormView):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Upload"}
     form_class = MediaUploadForm
