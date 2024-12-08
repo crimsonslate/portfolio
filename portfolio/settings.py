@@ -6,8 +6,9 @@ DEBUG = True
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 INTERNAL_IPS = ["127.0.0.1", "0.0.0.0"]
 LANGUAGE_CODE = "en-us"
-MEDIA_ROOT = BASE_DIR / "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "media/"
+DOCS_ROOT = BASE_DIR / "docs" / "build" / "html"
 ROOT_URLCONF = "portfolio.urls"
 SECRET_KEY = "django-insecure-#ezlo7tqc&h07y4g^1i3jqg78^z*jgsyd11kq812^=k4%!lk6b"
 STATIC_ROOT = "/static/"
@@ -92,8 +93,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.forms",
-    "tailwind",
-    "theme",
+    "docs",
     "crimsonslate_portfolio.apps.CrimsonslatePortfolioConfig",
 ]
 
