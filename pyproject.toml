@@ -52,7 +52,9 @@ dependencies = [
 ]
 
 [project.urls]
+Homepage = "https://github.com/crimsonslate/portfolio"
 Repository = "https://github.com/crimsonslate/portfolio"
+Documentation = "https://crimsonslate-portfolio.readthedocs.io/en/latest"
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
