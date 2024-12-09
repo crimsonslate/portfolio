@@ -18,7 +18,4 @@ sphinx:
 
 python:
    install:
-    - method: pip
-      path: crimsonslate_portfolio/
-      extra_requirements:
-       - dev
+    - requirements: requirements.txt
