@@ -169,7 +169,6 @@ dependencies = [
     { name = "click" },
     { name = "cookiecutter" },
     { name = "django" },
-    { name = "django-tailwind", extra = ["reload"] },
     { name = "idna" },
     { name = "imagesize" },
     { name = "jinja2" },
@@ -210,7 +209,6 @@ requires-dist = [
     { name = "click", specifier = ">=8.1.7" },
     { name = "cookiecutter", specifier = ">=2.6.0" },
     { name = "django", specifier = ">=5.1.3" },
-    { name = "django-tailwind", extras = ["reload"], specifier = ">=3.8.0" },
     { name = "idna", specifier = ">=3.10" },
     { name = "imagesize", specifier = ">=1.4.1" },
     { name = "jinja2", specifier = ">=3.1.4" },
@@ -255,19 +253,6 @@ wheels = [
 ]
 
 [[package]]
-name = "django-browser-reload"
-version = "1.17.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "asgiref" },
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/9f/bc/3c67f7daca53b826ec51888576fe5e117d9442d2d0acb58f4264d48b9dba/django_browser_reload-1.17.0.tar.gz", hash = "sha256:3667939cde0eee1a6d698dbe3b78cf10b573dabc4e711fb7933f1ba91fb98da4", size = 14312 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7f/8f/62fc4fbf5c05c2210e6cb616f1c2a3da53871dfecbaa4c44b1f482ca3e8f/django_browser_reload-1.17.0-py3-none-any.whl", hash = "sha256:d372c12c1c5962c02279a53cac7e8a020c48f104592c637a06d0768b28d2d6be", size = 12228 },
-]
-
-[[package]]
 name = "django-docs"
 version = "0.3.3"
 source = { registry = "https://pypi.org/simple" }
@@ -277,23 +262,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ba/91/571b5baf368ecf889472b0d4ca3cafe224add8544da6c05ee808c3de2d96/django-docs-0.3.3.tar.gz", hash = "sha256:f2b489ab122f6dc84a1a8f0e2be86dcc8b3958b31b2d0a4603570c47228408d0", size = 7554 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/cb/69ea9a1b9af32b66cb2ecbeb4aae532a222dcf4bd8755f8e8054799819ae/django_docs-0.3.3-py3-none-any.whl", hash = "sha256:7e85c5b5dd0b9b4d24099740ab16ac0449ff8acdfe8b0e26c08f3a4e50e7e5e1", size = 8711 },
-]
-
-[[package]]
-name = "django-tailwind"
-version = "3.8.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/ee/1065c57c87213f566d76b398f8391cd544380ef9661f7fdacdfe4264633c/django_tailwind-3.8.0.tar.gz", hash = "sha256:31c2f4a7879d685c2de0feaf0b63f246200b37337bea4d7dbafb59bc3f10c008", size = 8969 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/14/20c40882d9ee91f7a2a20d3c0175cf813340c02ae31c975ce567de2c7c67/django_tailwind-3.8.0-py3-none-any.whl", hash = "sha256:fa969c5b95d314b173fe2b2ed2cb2c03f2e2c94fdc2c01ff73a993fa159085da", size = 12936 },
-]
-
-[package.optional-dependencies]
-reload = [
-    { name = "django-browser-reload" },
 ]
 
 [[package]]
@@ -437,7 +405,7 @@ name = "opencv-python"
 version = "4.10.0.84"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy" },
+    { name = "numpy", marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4a/e7/b70a2d9ab205110d715906fc8ec83fbb00404aeb3a37a0654fdb68eb0c8c/opencv-python-4.10.0.84.tar.gz", hash = "sha256:72d234e4582e9658ffea8e9cae5b63d488ad06994ef12d81dc303b17472f3526", size = 95103981 }
 wheels = [
