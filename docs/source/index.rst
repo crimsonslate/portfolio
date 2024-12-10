@@ -6,12 +6,12 @@
 crimsonslate-portfolio documentation
 ====================================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
-
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
+    :caption: Contents
 
+    models/index.rst
+    views/index.rst
+    fixtures/index.rst
+    templates/index.rst
+    templatetags/index.rst

@@ -57,8 +57,8 @@ Repository = "https://github.com/crimsonslate/portfolio"
 Documentation = "https://crimsonslate-portfolio.readthedocs.io/en/latest"
 
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.setuptools]
 packages = ["crimsonslate_portfolio"] 

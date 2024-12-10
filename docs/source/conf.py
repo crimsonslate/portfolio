@@ -14,7 +14,7 @@ release = "1.3.0"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_rtd_theme"]
+extensions = ["sphinx_rtd_theme", "sphinx.ext.viewcode"]
 
 templates_path = ["_templates"]
 exclude_patterns = []
