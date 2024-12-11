@@ -14,10 +14,17 @@ release = "1.3.0"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_rtd_theme", "sphinx.ext.viewcode"]
+extensions = ["sphinx_rtd_theme", "sphinx.ext.intersphinx"]
 
 templates_path = ["_templates"]
 exclude_patterns = []
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3/", None),
+    "django": (
+        "http://docs.djangoproject.com/en/5.1/",
+        "http://docs.djangoproject.com/en/5.1/_objects/",
+    ),
+}
 
 
 # -- Options for HTML output -------------------------------------------------
