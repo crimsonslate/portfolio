@@ -19,9 +19,9 @@ Models
 
     .. py:attribute:: cover
 
-        *Optional.* A cover image.
+        A cover image.
 
-        :type: :py:class:`~django.core.files.File` | :py:type:`None`
+        :type: :py:class:`~django.core.files.File` | :py:obj:`None`
         :value: ``None``
 
 .. py:class:: Media
@@ -44,30 +44,88 @@ Models
 
     .. py:attribute:: thumb
 
-        *Optional*. A thumbnail image.
+        A thumbnail image.
 
         Automatically generated on save if the media is a video.
 
-        :type: :py:class:`~django.core.files.File` | :py:type:`None`
+        :type: :py:class:`~django.core.files.File` | :py:obj:`None`
         :value: ``None``
 
     .. py:attribute:: subtitle
 
-        *Optional*. A medium-length subtitle.
+        A medium-length subtitle.
 
         Maximum 128 characters.
 
-        :type: :py:class:`str` | :py:type:`None`
+        :type: :py:class:`str` | :py:obj:`None`
         :value: ``None``
 
     .. py:attribute:: desc
 
-        *Optional*. A lengthy description.
+        A lengthy description.
 
         Maximum 2048 characters.
 
-        :type: :py:class:`str` | :py:type:`None`
+        :type: :py:class:`str` | :py:obj:`None`
         :value: ``None``
+
+    .. py:attribute:: slug
+
+        A slug generated from a title.
+
+        :type: :py:class:`str` | :py:obj:`None`
+        :value: ``None``
+
+    .. py:attribute:: is_hidden
+
+        Whether or not the media is hidden.
+
+        :type: :py:class:`bool`
+        :value: ``False``
+
+    .. py:attribute:: is_image
+
+        Whether or not the media is an image.
+
+        Set on :py:meth:`~Media.save()`
+
+        :type: :py:class:`bool` | :py:obj:`None`
+        :value: ``None``
+
+    .. py:attribute:: categories
+
+        Categories the media is a member of.
+
+        :type: :py:class:`~django.db.models.QuerySet`
+        :value: :py:obj:`~django.db.models.QuerySet`
+
+    .. py:attribute:: date_created
+
+        The date the user created the media.
+
+        :type: :py:class:`~datetime.date` | :py:obj:`None`
+        :value: ``None``
+
+    .. py:attribute:: datetime_published
+
+        The date and time the user created the media.
+
+        Cannot be modified after creation time.
+
+        :type: :py:class:`~datetime.datetime` | :py:obj:`None`
+        :value: ``None``
+
+    .. py:method:: set_thumbnail([file=None]) -> None
+
+        Sets the media's thumbnail to the file.
+
+        If the file is ``None``, instead sets the media's thumbnail to the return value of :py:meth:`~Media.generate_thumbnail`.
+
+        :param file: The new thumbnail.
+        :type file: :py:class:`~django.core.files.File`
+        :return: Nothing.
+        :rtype: :py:obj:`None`
+        :raises AssertionError: If the media is an image.
 
     .. py:method:: generate_thumbnail([loc=0]) -> File
 
@@ -77,4 +135,5 @@ Models
         :type loc: :py:class:`int`
         :return: A new thumbnail file.
         :rtype: :py:class:`~django.core.files.File`
-        :raises ValueError: If the media is an image.
+        :raises AssertionError: If the media is an image.
+        :raises ValueError: If frame ``loc`` was not captured.

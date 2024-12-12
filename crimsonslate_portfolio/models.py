@@ -100,14 +100,13 @@ class Media(models.Model):
     def generate_thumbnail(self, loc: int = 0) -> File:
         timestamp: str = f"{datetime.datetime.now():%y_%m_%d_%f}"
         filename: str = f"default_thumbnail_{timestamp}.jpg"
-        frame: numpy.ndarray = self._capture_frame(loc)
 
+        frame: numpy.ndarray = self._capture_frame(loc)
         cv.imwrite(filename, frame)
         return File(open(filename, "rb"))
 
     def _capture_frame(self, loc: int = 0) -> numpy.ndarray:
-        if self.is_image:
-            raise ValueError("Cannot capture frame from image")
+        assert not self.is_image
 
         capture = cv.VideoCapture(self.source.path)
         if loc > 0:
