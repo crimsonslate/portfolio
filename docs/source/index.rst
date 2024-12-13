@@ -11,3 +11,5 @@ crimsonslate-portfolio documentation
     :caption: Contents
 
     models/index.rst
+    templatetags/index.rst
+    views/index.rst
