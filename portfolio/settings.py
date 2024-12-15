@@ -28,7 +28,7 @@ PORTFOLIO_PROFILE = {
     "EMAIL": "contact@crimsonslate.com",
     "PHONE": "+15555555555",
     "SOCIALS": {
-        "DISCORD": {
+        "DISCORD": {  # Use `None` for no icon
             "display_name": "crimsonslate",
             "profile_link": "https://discord.gg/***",  # Server link
             "username": "crimsonslate",

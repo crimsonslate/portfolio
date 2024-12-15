@@ -2,7 +2,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     DeleteView,
@@ -88,14 +88,14 @@ class SearchView(TemplateView, FormView):
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Search"}
     http_method_names = ["get", "post"]
     template_name = "portfolio/search.html"
+    partial_name = "portfolio/search_results.html"
     form_class = MediaSearchForm
     success_url = reverse_lazy("portfolio search")
 
-
-class SearchResultsView(TemplateView):
-    context_type = "text/html"
-    http_method_names = ["get"]
-    template_name = "portfolio/search_results.html"
+    def post(self, request: HttpRequest, *args, **kwargs):
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_name
+        return super().post(request, *args, **kwargs)
 
 
 class UploadView(LoginRequiredMixin, FormView):
@@ -103,7 +103,7 @@ class UploadView(LoginRequiredMixin, FormView):
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Upload"}
     form_class = MediaUploadForm
     http_method_names = ["get", "post"]
-    login_url = reverse_lazy("portfolio login")
+    login_url = reverse_lazy("login")
     success_url = reverse_lazy("portfolio gallery")
     template_name = "portfolio/upload.html"
 
