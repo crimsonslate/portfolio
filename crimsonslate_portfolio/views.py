@@ -83,7 +83,7 @@ class GalleryView(ListView):
     template_name = "portfolio/gallery.html"
 
 
-class SearchView(TemplateView, FormView):
+class SearchView(FormView):
     context_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Search"}
     http_method_names = ["get", "post"]
