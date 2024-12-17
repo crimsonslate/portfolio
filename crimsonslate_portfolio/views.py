@@ -2,7 +2,7 @@ from typing import Any
 
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     DeleteView,
@@ -41,7 +41,13 @@ class MediaUpdateView(LoginRequiredMixin, UpdateView):
     http_method_names = ["get", "post"]
     model = Media
     template_name = "portfolio/media/edit.html"
+    partial_name = "portfolio/media/_edit.html"
     login_url = reverse_lazy("portfolio login")
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_name
+        return super().request(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(*args, **kwargs)
@@ -56,7 +62,13 @@ class MediaDeleteView(LoginRequiredMixin, DeleteView):
     model = Media
     success_url = reverse_lazy("portfolio profile")
     template_name = "portfolio/media/delete.html"
+    partial_name = "portfolio/media/_edit.html"
     login_url = reverse_lazy("portfolio login")
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_name
+        return super().request(*args, **kwargs)
 
     def get_context_data(self, *args, **kwargs) -> dict[str, Any]:
         context = super().get_context_data(*args, **kwargs)

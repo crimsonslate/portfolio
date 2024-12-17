@@ -28,7 +28,7 @@ PORTFOLIO_PROFILE = {
     "EMAIL": "contact@crimsonslate.com",
     "PHONE": "+15555555555",
     "SOCIALS": {
-        "DISCORD": {  # Use `None` for no icon
+        "DISCORD": {
             "display_name": "crimsonslate",
             "profile_link": "https://discord.gg/***",  # Server link
             "username": "crimsonslate",
@@ -87,6 +87,7 @@ STORAGES = {
 
 INSTALLED_APPS = [
     "django.contrib.admin",
+    "django.contrib.admindocs",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -94,6 +95,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.forms",
     "docs",
+    "tailwind",
+    "theme",
     "crimsonslate_portfolio.apps.CrimsonslatePortfolioConfig",
 ]
 
@@ -105,6 +108,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 

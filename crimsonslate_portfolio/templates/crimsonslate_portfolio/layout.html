@@ -1,4 +1,4 @@
-{% load static %}
+{% load static tailwind_tags %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>{{ title }}</title>
-        <link rel="stylesheet" href="{% static 'crimsonslate_portfolio/css/dist.css' %}">
+        {% tailwind_css %}
         <script src="{% static 'crimsonslate_portfolio/js/htmx.min.js' %}" defer></script>
     </head>
     <body class="mx-auto mb-20 max-w-screen-xl bg-stone-100 dark:bg-gray-700 dark:text-stone-100" hx-headers="{'X-CSRFToken': '{{ csrf_token }}'}">
