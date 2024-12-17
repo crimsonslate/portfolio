@@ -1,9 +1,8 @@
 import cv2 as cv
-import datetime
-import imagesize
 import numpy
 
 from datetime import date
+
 
 from django.core.files import File
 from django.core.files.storage import storages
@@ -95,12 +94,11 @@ class Media(models.Model):
         return reverse("media detail", kwargs={"slug": self.slug})
 
     def set_thumbnail(self, file: File | None = None) -> None:
-        self.thumb = file if file else self.generate_thumbnail()
+        self.thumb = file if file else self.extract_frame(0)
 
-    def generate_thumbnail(self, loc: int = 0) -> File:
-        timestamp: str = f"{datetime.datetime.now():%y_%m_%d_%f}"
-        filename: str = f"default_thumbnail_{timestamp}.jpg"
-
+    def extract_frame(self, loc: int = 0) -> File:
+        """Extracts a frame from the media and returns it as a jpg file."""
+        filename: str = f"capture_{self.pk}_{loc}.jpg"
         frame: numpy.ndarray = self._capture_frame(loc)
         cv.imwrite(filename, frame)
         return File(open(filename, "rb"))
@@ -122,16 +120,6 @@ class Media(models.Model):
 
         finally:
             capture.release()
-
-    @property
-    def dimensions(self) -> tuple[int, int]:
-        if not self.is_image and not self.thumb:
-            self.set_thumbnail(file=None)
-            self.refresh_from_db()
-
-        image = self.source.path if self.is_image else self.thumb.path
-        width, height = imagesize.get(image)
-        return int(width), int(height)
 
     @property
     def file_extension(self) -> str:
