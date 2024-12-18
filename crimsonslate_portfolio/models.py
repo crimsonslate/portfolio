@@ -3,7 +3,6 @@ import numpy
 
 from datetime import date
 
-
 from django.core.files import File
 from django.core.files.storage import storages
 from django.core.validators import get_available_image_extensions
