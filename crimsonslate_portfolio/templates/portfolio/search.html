@@ -10,11 +10,7 @@
             <h2 class="text-2xl text-gray-800 dark:text-gray-300">Looking for something?</h2>
         </div>
     </div>
-    <form action="{% url 'portfolio search' %}" method="post" class="grid grid-cols-1 gap-8" autocomplete="off">
-        {% csrf_token %}
-        {{ form.title }}
-        <span class="sr-only">Type or press enter to submit</span>
-    </form>
-    {% include "crimsonslate_portfolio/search_results.html" with results=results %}
+    <input hx-get="{% url 'portfolio search' %}?q={{ q }}&categories={{ categories|default_if_none:'' }}" hx-target="#search-results" hx-swap="outerHTML" hx-trigger="search, keyup changed delay:150ms" autocomplete="off">
+    {% include "portfolio/search_results.html" with results=results %}
 </div>
 {% endblock content %}

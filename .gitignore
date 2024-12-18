@@ -15,9 +15,6 @@ venv
 .env
 db.*
 node_modules/
+media/
 package-lock.json
-
-
-# Added by cargo
-
-/target
+*.jpg

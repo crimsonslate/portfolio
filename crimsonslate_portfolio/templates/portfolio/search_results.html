@@ -1,7 +1,7 @@
 {% load portfolio_display %}
-<div id="id-search-results" name="search-results" class="grid grid-cols-2 gap-4 lg:grid-cols-3">
+<div id="search-results" class="{% if not results %}hidden{% else %}flex flex-row flex-grow{% endif %}">
     {% for result in results %}
-    <a href="{% url 'media detail' result.slug %}" class="inline-flex flex-col gap-2 bg-blue-300 px-8 py-4">
+    <a href="{% url 'media detail' result.slug %}" class="inline-flex flex-col gap-2 bg-gray-300 px-8 py-4">
         {% display result force_image=True css_class="w-96 h-full" %}
         {{ result.title|truncatechars:24 }}
     </a>

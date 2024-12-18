@@ -1,6 +1,6 @@
 [
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 1,
         "fields" : {
             "name": "Brand Design",
@@ -8,7 +8,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 2,
         "fields" : {
             "name": "Console UI",
@@ -16,7 +16,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 3,
         "fields" : {
             "name": "Mobile UI",
@@ -24,7 +24,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 4,
         "fields" : {
             "name": "Video Games",
@@ -32,7 +32,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 5,
         "fields" : {
             "name": "Web Application UI",

@@ -1,6 +1,6 @@
 [
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 1,
         "fields" : {
             "name": "Ceramics",
@@ -8,7 +8,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 2,
         "fields" : {
             "name": "Marble",
@@ -16,7 +16,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 3,
         "fields" : {
             "name": "Paintings",
@@ -24,7 +24,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 4,
         "fields" : {
             "name": "Gallery Displays",
@@ -32,7 +32,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 5,
         "fields" : {
             "name": "Digital Work",

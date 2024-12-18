@@ -1,6 +1,6 @@
 [
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 1,
         "fields" : {
             "name": "Action Shots",
@@ -8,7 +8,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 2,
         "fields" : {
             "name": "Highlights",
@@ -16,7 +16,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 3,
         "fields" : {
             "name": "Family & Friends",
@@ -24,7 +24,7 @@
         }
     },
     {
-        "model": "portfolio.MediaCategory",
+        "model": "crimsonslate_portfolio.MediaCategory",
         "pk": 4,
         "fields" : {
             "name": "2018 Championship",

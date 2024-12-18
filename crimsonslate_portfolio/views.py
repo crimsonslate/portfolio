@@ -1,7 +1,9 @@
 from typing import Any
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
@@ -95,19 +97,45 @@ class GalleryView(ListView):
     template_name = "portfolio/gallery.html"
 
 
-class SearchView(FormView):
+class SearchView(TemplateView):
     context_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Search"}
-    http_method_names = ["get", "post"]
+    http_method_names = ["get"]
     template_name = "portfolio/search.html"
     partial_name = "portfolio/search_results.html"
-    form_class = MediaSearchForm
-    success_url = reverse_lazy("portfolio search")
+    queryset = Media.objects.filter(is_hidden__exact=False)
 
-    def post(self, request: HttpRequest, *args, **kwargs):
+    def get_queryset(self) -> QuerySet:
+        return self.queryset
+
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponse:
         if request.headers.get("HX-Request"):
-            self.template_name = self.partial_name
-        return super().post(request, *args, **kwargs)
+            self.template_name: str = self.partial_name
+        form = MediaSearchForm(
+            {
+                "title": request.GET.get("q"),
+                "categories": request.GET.get("categories"),
+            }
+        )
+        context: dict[str, Any] = self.get_context_data(form, **kwargs)
+        return self.render_to_response(context)
+
+    def get_context_data(
+        self, form: MediaSearchForm | None = None, **kwargs
+    ) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data(**kwargs)
+        if form and form.is_valid():
+            results = self.search_media(form)
+            context["results"] = results
+        return context
+
+    def search_media(self, form: MediaSearchForm) -> QuerySet:
+        results: QuerySet = self.get_queryset()
+        if form.cleaned_data.get("categories"):
+            results = results.filter(categories__in=form.cleaned_data["categories"])
+        if form.cleaned_data["title"] != "*":
+            results = results.filter(title__iexact=form.cleaned_data["title"])
+        return results
 
 
 class UploadView(LoginRequiredMixin, FormView):

@@ -97,6 +97,7 @@ INSTALLED_APPS = [
     "docs",
     "tailwind",
     "theme",
+    "django_browser_reload",
     "crimsonslate_portfolio.apps.CrimsonslatePortfolioConfig",
 ]
 
