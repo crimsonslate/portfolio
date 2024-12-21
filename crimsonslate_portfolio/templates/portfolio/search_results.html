@@ -1,8 +1,8 @@
 {% load portfolio_display %}
-<div id="search-results" class="{% if not results %}hidden{% else %}flex flex-row flex-grow{% endif %}">
-    {% for result in results %}
-    <a href="{% url 'media detail' result.slug %}" class="inline-flex flex-col gap-2 bg-gray-300 px-8 py-4">
-        {% display result force_image=True css_class="w-96 h-full" %}
+<div id="search-results" class="{% if search_results == None %}hidden{% else %}flex flex-grow{% endif %}">
+    {% for result in search_results %}
+    <a href="{% url 'media detail' result.slug %}" class="bg-gray-300 px-8 py-12">
+        {% display result force_image=True css_class="h-full" %}
         {{ result.title|truncatechars:24 }}
     </a>
     {% endfor %}

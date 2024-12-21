@@ -1,5 +1,7 @@
 from typing import Any
+from django import forms
 from django.forms import ModelForm, widgets
+from django.urls import reverse_lazy
 
 from crimsonslate_portfolio.models import Media
 
@@ -33,18 +35,21 @@ class MediaEditForm(ModelForm):
         ]
 
 
-class MediaSearchForm(ModelForm):
-    class Meta:
-        model = Media
-        fields = [
-            "title",
-            "categories",
-            "date_created",
-        ]
-        widgets = {"title": widgets.Input({"type": "search"})}
+class MediaSearchForm(forms.Form):
+    title = forms.CharField(
+        required=False,
+        widget=widgets.TextInput(
+            attrs={
+                "hx-trigger": "load, keyup changed delay:150ms",
+                "hx-post": reverse_lazy("portfolio search"),
+                "class": "w-full block rounded p-2 border-gray-600",
+                "autofocus": True,
+                "autocomplete": False,
+            }
+        ),
+    )
 
-    def clean(self) -> dict[str, Any]:
-        cleaned_data: dict[str, Any] = super().clean()
-        if not cleaned_data.get("title"):
-            cleaned_data["title"] = "*"
-        return cleaned_data
+    def clean_title(self) -> str:
+        if not self.cleaned_data.get("title"):
+            self.cleaned_data["title"] = "*"
+        return self.cleaned_data["title"]
