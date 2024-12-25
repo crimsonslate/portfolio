@@ -1,4 +1,4 @@
-import cv2 as cv
+# import cv2 as cv
 import numpy
 
 from datetime import date
@@ -86,39 +86,39 @@ class Media(models.Model):
             self.is_image = True
         else:
             self.is_image = False
-            self.set_thumbnail(file=None)
+            # self.set_thumbnail(file=None)
         return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("media detail", kwargs={"slug": self.slug})
 
-    def set_thumbnail(self, file: File | None = None) -> None:
-        self.thumb = file if file else self.extract_frame(0)
+    # def set_thumbnail(self, file: File | None = None) -> None:
+    #     self.thumb = file if file else self.extract_frame(0)
 
-    def extract_frame(self, loc: int = 0) -> File:
-        """Extracts a frame from the media and returns it as a jpg file."""
-        filename: str = f"capture_{self.pk}_{loc}.jpg"
-        frame: numpy.ndarray = self._capture_frame(loc)
-        cv.imwrite(filename, frame)
-        return File(open(filename, "rb"))
+    # def extract_frame(self, loc: int = 0) -> File:
+    #     """Extracts a frame from the media and returns it as a jpg file."""
+    #     filename: str = f"capture_{self.pk}_{loc}.jpg"
+    #     frame: numpy.ndarray = self._capture_frame(loc)
+    #     cv.imwrite(filename, frame)
+    #     return File(open(filename, "rb"))
 
-    def _capture_frame(self, loc: int = 0) -> numpy.ndarray:
-        assert not self.is_image
+    # def _capture_frame(self, loc: int = 0) -> numpy.ndarray:
+    #     assert not self.is_image
 
-        capture = cv.VideoCapture(self.source.path)
-        if loc > 0:
-            capture.set(cv.CAP_PROP_POS_FRAMES, loc)
+    #     capture = cv.VideoCapture(self.source.path)
+    #     if loc > 0:
+    #         capture.set(cv.CAP_PROP_POS_FRAMES, loc)
 
-        try:
-            ret, frame = capture.read()
-            if not ret:
-                raise ValueError(f"Failed to read frame {loc} in '{self.source.path}'")
-            if frame.dtype != numpy.uint8:
-                frame = numpy.clip(frame * 255, 0, 255).astype(numpy.uint8)
-            return frame
+    #     try:
+    #         ret, frame = capture.read()
+    #         if not ret:
+    #             raise ValueError(f"Failed to read frame {loc} in '{self.source.path}'")
+    #         if frame.dtype != numpy.uint8:
+    #             frame = numpy.clip(frame * 255, 0, 255).astype(numpy.uint8)
+    #         return frame
 
-        finally:
-            capture.release()
+    #     finally:
+    #         capture.release()
 
     @property
     def file_extension(self) -> str:
