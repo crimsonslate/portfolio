@@ -1,4 +1,3 @@
-from typing import Any
 from django import forms
 from django.forms import ModelForm, widgets
 from django.urls import reverse_lazy
@@ -6,18 +5,15 @@ from django.urls import reverse_lazy
 from crimsonslate_portfolio.models import Media
 
 
-class MediaUploadForm(ModelForm):
-    class Meta:
-        model = Media
-        fields = [
-            "source",
-            "thumb",
-            "title",
-            "subtitle",
-            "desc",
-            "is_hidden",
-            "categories",
-        ]
+class MediaUploadForm(forms.Form):
+    file = forms.FileField()
+    chunk_size = forms.IntegerField(
+        min_value=64 * 2**10, max_value=256 * 2**10, step_size=64 + 2**10
+    )
+    upload_id = forms.CharField(widget=widgets.HiddenInput())
+    part_id = forms.IntegerField(
+        min_value=1, max_value=10000, widget=widgets.HiddenInput()
+    )
 
 
 class MediaEditForm(ModelForm):

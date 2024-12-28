@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 DEBUG = True
@@ -21,6 +22,7 @@ USE_TZ = True
 WSGI_APPLICATION = "portfolio.wsgi.application"
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 
+PORTFOLIO_BUCKET_NAME = "crimsonslate-bucket"
 PORTFOLIO_PROFILE = {
     "NAME": "Crimsonslate",
     "FIRST_NAME": "Crimson",

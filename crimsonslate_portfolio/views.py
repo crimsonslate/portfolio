@@ -1,10 +1,17 @@
+from datetime import datetime
 from typing import Any
+from uuid import uuid4
 
+from boto3.session import Session
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.urls import reverse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files.base import File
 from django.db.models import Q, QuerySet
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import (
     DeleteView,
     DetailView,
@@ -132,26 +139,116 @@ class SearchView(FormView):
         return results
 
 
-class UploadView(LoginRequiredMixin, FormView):
+class UploadView(FormView):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Upload"}
-    form_class = MediaUploadForm
     http_method_names = ["get", "post"]
     login_url = reverse_lazy("login")
-    success_url = reverse_lazy("portfolio gallery")
+    form_class = MediaUploadForm
+    success_url = reverse_lazy("upload complete")
     template_name = "portfolio/upload.html"
 
-    def get_success_url(self, media: Media | None = None) -> str:
-        if media is not None:
-            return reverse("media detail", kwargs={"slug": media.slug})
-        return reverse("portfolio gallery")
+    def generate_upload_key(self) -> str:
+        return str(uuid4())
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.boto3_session = Session().client("s3")
+        self.upload_key = self.generate_upload_key()
+        request.session["upload_key"] = self.upload_key
 
     def form_valid(self, form: MediaUploadForm) -> HttpResponseRedirect:
-        media = Media.objects.create(
-            source=form.cleaned_data["source"],
-            thumb=form.cleaned_data["thumb"],
-            title=form.cleaned_data["title"],
-            subtitle=form.cleaned_data["subtitle"],
-            desc=form.cleaned_data["desc"],
+        file: File = form.cleaned_data["file"]
+        response = self.boto3_session.create_multipart_upload(
+            **{
+                "Bucket": settings.PORTFOLIO_BUCKET_NAME,
+                "ContentEncoding": "gzip",
+                "ContentLanguage": "en-US",
+                "ContentType": "multipart/form-data",
+                "Key": self.upload_key,
+            }
         )
-        return HttpResponseRedirect(self.get_success_url(media))
+        return super().form_valid(form=form)
+
+    def get_success_url(self, boto3_response: dict | None = None) -> str:
+        if not boto3_response:
+            return super().get_success_url()
+        return reverse(
+            "upload part", kwargs={"upload_id": boto3_response.get("UploadId")}
+        )
+
+
+class UploadPartView(FormView):
+    content_type = "text/html"
+    form_class = MediaUploadForm
+    http_method_names = ["post"]
+    success_url = reverse_lazy("upload")
+    template_name = "portfolio/upload_part.html"
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        self.boto3_session = Session().client("s3")
+        self.upload_key = request.session.get("upload_key")
+        self.upload_id = self.kwargs.get("upload_id")
+        self.part_id = self.kwargs.get("part_id")
+
+    def form_valid(self, form: MediaUploadForm) -> HttpResponseRedirect:
+        if not form.cleaned_data["upload_id"]:
+            form.add_error("upload_id", ValidationError(_("No upload id provided.")))
+            return self.form_invalid(form=form)
+
+        file: File = form.cleaned_data["file"]
+        upload_id: int = form.cleaned_data["upload_id"]
+        chunk_size: int = form.cleaned_data.get("chunk_size", 256 * 2**10)
+        chunks = file.chunks(chunk_size)
+        parts: list = []
+        for part_id, chunk in enumerate(chunks):
+            part_response = self.boto3_session.upload_part(
+                **{
+                    "Body": chunk,
+                    "UploadId": upload_id,
+                    "PartNumber": part_id + 1,  # AWS parts start index at 1
+                    "Bucket": settings.PORTFOLIO_BUCKET_NAME,
+                    "ContentEncoding": "gzip",
+                    "ContentLanguage": "en-US",
+                    "ContentType": "multipart/form-data",
+                    "Key": self.upload_key,
+                }
+            )
+            parts.append(
+                {
+                    "ETag": part_response.get("ETag"),
+                    "PartNumber": part_id,
+                }
+            )
+        complete_response = self.boto3_session.complete_multipart_upload(
+            **{
+                "Bucket": settings.PORTFOLIO_BUCKET_NAME,
+                "Key": self.upload_key,
+                "UploadId": upload_id,
+                "MultipartUpload": {
+                    "Parts": parts,
+                },
+            }
+        )
+        media = self.create_media(response)
+        return super().form_valid(form=form)
+
+    def create_media(self, response: dict) -> Media:
+        source_file: File = self.boto3_session.get_object(
+            **{
+                "Bucket": settings.PORTFOLIO_BUCKET_NAME,
+                "IfMatch": True,
+                "Key": response.get("Key"),
+            }
+        )
+        return Media.objects.create(
+            title=self.upload_key,
+            source=source_file,
+        )
+
+
+class UploadProgressView(TemplateView):
+    content_type = "text/html"
+    http_method_names = ["get"]
+    template_name = "portfolio/upload_progress.html"

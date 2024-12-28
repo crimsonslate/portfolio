@@ -1,15 +1,17 @@
-# import cv2 as cv
-import numpy
+from datetime import date, timedelta
+from uuid import uuid4
 
-from datetime import date
-
-from django.core.files import File
+from datetime import datetime
+from boto3.session import Session
 from django.core.files.storage import storages
+from django.core.files.uploadedfile import UploadedFile
 from django.core.validators import get_available_image_extensions
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
+from django.conf import settings
+from django.core.files.uploadhandler import FileUploadHandler
 
 from crimsonslate_portfolio.validators import validate_media_file_extension
 
@@ -40,14 +42,11 @@ class Media(models.Model):
         unique=True,
     )
     source = models.FileField(
-        upload_to="source/",
-        storage=storages["bucket"],
-        validators=[validate_media_file_extension],
+        storage=storages["bucket"], validators=[validate_media_file_extension]
     )
     thumb = models.ImageField(
         verbose_name="thumbnail",
         storage=storages["bucket"],
-        upload_to="thumb/",
         null=True,
         blank=True,
         default=None,
@@ -86,39 +85,10 @@ class Media(models.Model):
             self.is_image = True
         else:
             self.is_image = False
-            # self.set_thumbnail(file=None)
         return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
         return reverse("media detail", kwargs={"slug": self.slug})
-
-    # def set_thumbnail(self, file: File | None = None) -> None:
-    #     self.thumb = file if file else self.extract_frame(0)
-
-    # def extract_frame(self, loc: int = 0) -> File:
-    #     """Extracts a frame from the media and returns it as a jpg file."""
-    #     filename: str = f"capture_{self.pk}_{loc}.jpg"
-    #     frame: numpy.ndarray = self._capture_frame(loc)
-    #     cv.imwrite(filename, frame)
-    #     return File(open(filename, "rb"))
-
-    # def _capture_frame(self, loc: int = 0) -> numpy.ndarray:
-    #     assert not self.is_image
-
-    #     capture = cv.VideoCapture(self.source.path)
-    #     if loc > 0:
-    #         capture.set(cv.CAP_PROP_POS_FRAMES, loc)
-
-    #     try:
-    #         ret, frame = capture.read()
-    #         if not ret:
-    #             raise ValueError(f"Failed to read frame {loc} in '{self.source.path}'")
-    #         if frame.dtype != numpy.uint8:
-    #             frame = numpy.clip(frame * 255, 0, 255).astype(numpy.uint8)
-    #         return frame
-
-    #     finally:
-    #         capture.release()
 
     @property
     def file_extension(self) -> str:
