@@ -1,3 +1,4 @@
+from os import getenv
 from pathlib import Path
 
 
@@ -21,8 +22,11 @@ USE_I18N = True
 USE_TZ = True
 WSGI_APPLICATION = "portfolio.wsgi.application"
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
+S3_UPLOAD_BUCKET_NAME = "crimsonslate-bucket"
+S3_UPLOAD_REGION = "us-east-1"
+S3_UPLOAD_CHUNK_SIZE = 5 * 2**20
 
-PORTFOLIO_BUCKET_NAME = "crimsonslate-bucket"
+
 PORTFOLIO_PROFILE = {
     "NAME": "Crimsonslate",
     "FIRST_NAME": "Crimson",
@@ -83,7 +87,13 @@ STORAGES = {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
     "bucket": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "location": "media/",
+            "bucket_name": S3_UPLOAD_BUCKET_NAME,
+            "region_name": S3_UPLOAD_REGION,
+            "verify": False,
+        },
     },
 }
 
@@ -131,6 +141,11 @@ TEMPLATES = [
     },
 ]
 
+FILE_UPLOAD_HANDLERS = [
+    "crimsonslate_portfolio.uploadhandler.S3BucketUploadHandler",
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {

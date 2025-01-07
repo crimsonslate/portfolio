@@ -1,0 +1,12 @@
+<form
+    class="{{ class }}"
+    hx-post="{% url 'update file' %}"
+    hx-encoding="multipart/form-data"
+    hx-swap="outerHTML"
+    hx-target="this"
+    hx-target="this"
+>
+    {% csrf_token %}
+    {{ form }}
+    <input hx-trigger="click" type="submit" value="Submit">
+</form>

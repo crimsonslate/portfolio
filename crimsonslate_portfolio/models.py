@@ -1,19 +1,28 @@
-from datetime import date, timedelta
-from uuid import uuid4
+from datetime import date
 
-from datetime import datetime
-from boto3.session import Session
 from django.core.files.storage import storages
-from django.core.files.uploadedfile import UploadedFile
 from django.core.validators import get_available_image_extensions
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
-from django.conf import settings
-from django.core.files.uploadhandler import FileUploadHandler
 
 from crimsonslate_portfolio.validators import validate_media_file_extension
+
+
+class MediaSourceFile(models.Model):
+    file = models.FileField(storage=storages["bucket"], upload_to="source/")
+    media = models.ForeignKey(
+        "crimsonslate_portfolio.Media",
+        blank=True,
+        default=None,
+        null=True,
+        on_delete=models.CASCADE,
+        validators=[validate_media_file_extension],
+    )
+
+    def __str__(self) -> str:
+        return self.file.name
 
 
 class MediaCategory(models.Model):
@@ -88,7 +97,7 @@ class Media(models.Model):
         return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
-        return reverse("media detail", kwargs={"slug": self.slug})
+        return reverse("detail media", kwargs={"slug": self.slug})
 
     @property
     def file_extension(self) -> str:

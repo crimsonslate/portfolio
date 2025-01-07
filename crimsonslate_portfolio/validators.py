@@ -6,7 +6,7 @@ from django.core.validators import (
 
 
 def validate_media_file_extension(value: File) -> None:
-    video_extensions: list[str] = ["mp4", "mkv", "m4a", "webm"]
+    video_extensions: list[str] = ["mp4"]  # Only mp4 is supported rn
     image_extensions: list[str] = list(get_available_image_extensions())
     validator = FileExtensionValidator(
         allowed_extensions=[

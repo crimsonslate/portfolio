@@ -9,7 +9,7 @@
         {% tailwind_css %}
         <script src="{% static 'crimsonslate_portfolio/js/htmx.min.js' %}" defer></script>
     </head>
-    <body class="mx-auto mb-20 max-w-screen-xl bg-stone-100 dark:bg-gray-700 dark:text-stone-100" hx-headers="{'X-CSRFToken': '{{ csrf_token }}'}">
+    <body class="mx-auto mb-20 max-w-screen-xl bg-stone-100 dark:bg-gray-700 dark:text-stone-100">
         <main>
         {% block content %}
         {% endblock content %}
@@ -17,8 +17,18 @@
         <footer class="fixed bottom-0 left-0 z-20 flex w-full items-center justify-between border-t border-gray-200 bg-white p-6 shadow dark:border-gray-600 dark:bg-gray-800">
             <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2024 <a href="{% url 'portfolio contact' %}" class="hover:underline">{{ profile.NAME|default_if_none:'yo mama' }}</a>. All Rights Reserved.</span>
             <ul class="flex gap-8">
+                {% if user and user.is_authenticated %}
                 <li>
-                    <a href="{% url 'portfolio gallery' %}">
+                    <a href="{% url 'list files' %}">
+                        <span class="sr-only">Files</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+                        </svg>
+                    </a>
+                </li>
+                {% endif %}
+                <li>
+                    <a href="{% url 'gallery media' %}">
                         <span class="sr-only">Gallery</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205 3 1m1.5.5-1.5-.5M6.75 7.364V3h-3v18m3-13.636 10.5-3.819" />
@@ -26,7 +36,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{% url 'portfolio search' %}">
+                    <a href="{% url 'search media' %}">
                         <span class="sr-only">Search</span>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                               <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
@@ -43,10 +53,5 @@
                 </li>
             </ul>
         </footer>
-        <script>
-            document.body.addEventListener('htmx:configRequest', (event) => {
-                event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
-            })
-        </script>
     </body>
 </html>

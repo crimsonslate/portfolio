@@ -1,0 +1,10 @@
+<div
+    class="{{ class }}"
+    id="{{ file.pk }}"
+    hx-swap="outerHTML"
+    hx-target="this"
+    hx-trigger="click"
+    hx-get="{% url 'detail file' file.pk %}"
+>
+    {{ file.name }}
+</div>
