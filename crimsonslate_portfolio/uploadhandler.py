@@ -22,28 +22,23 @@ class S3BucketUploadHandler(FileUploadHandler):
         self.parts: list = []
 
     def upload_complete(self) -> None:
-        print("Executing S3BucketUploadHandler.upload_complete()...")
         self._s3_complete_multipart_upload(self.parts)
 
     def upload_interrupted(self) -> None:
-        print("Executing S3BucketUploadHandler.upload_interrupted()...")
         self._s3_abort_multipart_upload()
 
     def new_file(self, *args, **kwargs) -> None:
-        print("Executing S3BucketUploadHandler.new_file()...")
         super().new_file(*args, **kwargs)
         assert self.file_name, "File name was not set."
         self._s3_start_multipart_upload(self.file_name)
 
     def file_complete(self, file_size: int) -> UploadedFile | None:
-        print("Executing S3BucketUploadHandler.file_complete()...")
         self.upload_complete()
         assert self.object_key, "Object key was not set."
         self.file = self._s3_get_file()
         return self.file
 
     def receive_data_chunk(self, raw_data: bytes, start: int) -> None:
-        print("Executing S3BucketUploadHandler.receive_data_chunk()...")
         data_chunk: bytes = raw_data[start:]
         part_number: int = 1 if start == 1 else len(self.parts) + 1
         if data_chunk:
@@ -51,7 +46,6 @@ class S3BucketUploadHandler(FileUploadHandler):
 
     def validate_chunk_size(self, chunk_size: int) -> None:
         """Raises ImproperlyConfigured if the chunk size is invalid."""
-        print("Executing S3BucketUploadHandler.validate_chunk_size()...")
         max_chunk_size: int = 5 * 2**40  # 5TiB
         min_chunk_size: int = 5 * 2**20  # 5MiB
         if not isinstance(chunk_size, int) or chunk_size <= 0:
@@ -66,7 +60,6 @@ class S3BucketUploadHandler(FileUploadHandler):
             raise ImproperlyConfigured("S3_UPLOAD_CHUNK_SIZE cannot be less than 5MiB.")
 
     def _s3_get_file(self) -> UploadedFile:
-        print("Executing S3BucketUploadHandler._s3_get_file()...")
         """
         Uploads a part of data to the multipart upload.
 
@@ -93,7 +86,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         )
 
     def _s3_start_multipart_upload(self, object_key: str) -> None:
-        print("Executing S3BucketUploadHandler._s3_start_multipart_upload()...")
         """
         Starts a multipart upload in :py:attr:`bucket_name`.
 
@@ -106,7 +98,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         :rtype: :py:obj:`None`
 
         """
-
         response = self.boto3_client.create_multipart_upload(
             **{
                 "Bucket": self.bucket_name,
@@ -118,7 +109,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         self.object_key = object_key
 
     def _s3_continue_multipart_upload(self, data: bytes, part: int) -> None:
-        print("Executing S3BucketUploadHandler._s3_continue_multipart_upload()...")
         """
         Uploads a part of data to the multipart upload.
 
@@ -132,7 +122,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         :rtype: :py:obj:`None`
 
         """
-
         assert self.object_key, "Object key was not set"
         assert self.upload_id, "Upload id was not set"
         response = self.boto3_client.upload_part(
@@ -147,7 +136,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         self.parts.append({"ETag": response.get("ETag"), "PartNumber": part})
 
     def _s3_complete_multipart_upload(self, parts: list) -> None:
-        print("Executing S3BucketUploadHandler._s3_complete_multipart_upload()...")
         """
         Completes the S3 multipart upload.
 
@@ -159,7 +147,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         :rtype: :py:obj:`None`
 
         """
-
         assert self.object_key, "Object key was not set"
         assert self.upload_id, "Upload id was not set"
         self.boto3_client.complete_multipart_upload(
@@ -174,7 +161,6 @@ class S3BucketUploadHandler(FileUploadHandler):
         )
 
     def _s3_abort_multipart_upload(self) -> None:
-        print("Executing S3BucketUploadHandler._s3_abort_multipart_upload()...")
         """
         Aborts the S3 multipart upload in progress.
 

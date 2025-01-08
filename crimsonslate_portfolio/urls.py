@@ -4,7 +4,6 @@ from . import views
 
 urlpatterns = [
     path("contact/", views.ContactView.as_view(), name="portfolio contact"),
-    path("dropzone/", views.DropzoneView.as_view(), name="dropzone media"),
     path("gallery/", views.MediaGalleryView.as_view(), name="gallery media"),
     path("search/", views.MediaSearchView.as_view(), name="search media"),
     path("results/", views.MediaSearchResultsView.as_view(), name="search results"),
