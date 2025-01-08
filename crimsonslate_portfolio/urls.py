@@ -22,6 +22,7 @@ urlpatterns = [
         views.SourceFileDeleteView.as_view(),
         name="delete file",
     ),
+    path("<int:pk>/create/", views.MediaCreateView.as_view(), name="create media"),
     path("<str:slug>/", views.MediaDetailView.as_view(), name="detail media"),
     path("<str:slug>/delete/", views.MediaDeleteView.as_view(), name="delete media"),
     path("<str:slug>/update/", views.MediaUpdateView.as_view(), name="update media"),

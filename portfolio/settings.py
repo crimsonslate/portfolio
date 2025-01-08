@@ -142,7 +142,7 @@ TEMPLATES = [
 ]
 
 FILE_UPLOAD_HANDLERS = [
-    "crimsonslate_portfolio.uploadhandler.S3BucketUploadHandler",
+    # "crimsonslate_portfolio.uploadhandler.S3BucketUploadHandler",
     "django.core.files.uploadhandler.MemoryFileUploadHandler",
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]

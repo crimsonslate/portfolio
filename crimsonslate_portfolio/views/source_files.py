@@ -34,13 +34,13 @@ class SourceFileCreateView(CreateView):
     extra_context = {
         "title": "New File",
         "profile": settings.PORTFOLIO_PROFILE,
-        "form_class": "p-8 mx-auto border-gray-600 border-dashed border-4 rounded-xl",
+        "class": "p-8 mx-auto border-gray-600 border-dashed border-2 rounded-xl",
     }
     fields = ["file"]
     http_method_names = ["get", "post", "delete"]
     template_name = "portfolio/files/create.html"
     partial_template_name = "portfolio/files/partials/_create.html"
-    success_url = reverse_lazy("portfolio files")
+    success_url = reverse_lazy("list files")
     model = MediaSourceFile
     queryset = MediaSourceFile.objects.all()
     login_url = reverse_lazy("portfolio login")

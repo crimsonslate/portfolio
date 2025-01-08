@@ -14,7 +14,7 @@ from django.views.generic import (
     ListView,
 )
 
-from crimsonslate_portfolio.models import Media
+from crimsonslate_portfolio.models import Media, MediaSourceFile
 
 
 class MediaDetailView(DetailView):
@@ -55,26 +55,16 @@ class MediaCreateView(CreateView):
     success_url = reverse_lazy("portfolio gallery")
     template_name = "portfolio/media/create.html"
 
+    def get_initial(self) -> dict[str, Any]:
+        initial: dict[str, Any] = super().get_initial()
+        initial["source"] = self.file
+        return initial
+
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
-        self.htmx_request = bool(request.headers.get("HX-Request"))
-        if self.htmx_request:
+        self.file = MediaSourceFile.objects.get(pk=self.kwargs["pk"])
+        if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
-
-    def form_valid(self, form: forms.Form) -> HttpResponseRedirect:
-        super().form_valid(form=form)
-        media: Media = self.get_object()
-        return HttpResponseRedirect(self.get_success_url(media))
-
-    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not self.htmx_request:
-            return HttpResponse(status=403)
-        return HttpResponse(b"", status=200)
-
-    def get_success_url(self, media: Media | None = None) -> str:
-        if media is not None:
-            return reverse("media detail", kwargs={"slug": media.slug})
-        return super().get_success_url()
 
 
 class MediaDeleteView(DeleteView):
