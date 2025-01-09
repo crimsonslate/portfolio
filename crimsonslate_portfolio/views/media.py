@@ -3,7 +3,7 @@ from typing import Any
 from django import forms
 from django.db.models import QuerySet
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
+from django.http import HttpRequest, HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -23,25 +23,24 @@ class MediaDetailView(DetailView):
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
     http_method_names = ["get"]
     model = Media
+    queryset = Media.objects.all().exclude(is_hidden=True)
     partial_template_name = "portfolio/media/partials/_detail.html"
     template_name = "portfolio/media/detail.html"
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
+
+    def get_queryset(self) -> QuerySet:
+        if self.request.user and self.request.user.is_staff:
+            return Media.objects.all()
+        return super().get_queryset()
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context: dict[str, Any] = super().get_context_data(**kwargs)
         context["title"] = self.get_object().title
         return context
-
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.htmx_request = bool(request.headers.get("HX-Request"))
-        if self.htmx_request:
-            self.template_name = self.partial_template_name
-
-    def get_queryset(self) -> QuerySet:
-        queryset = Media.objects.all()
-        if not self.request.user or not self.request.user.is_staff:
-            queryset = Media.objects.filter(is_hidden=False)
-        return queryset
 
 
 class MediaCreateView(CreateView):
@@ -55,16 +54,16 @@ class MediaCreateView(CreateView):
     success_url = reverse_lazy("portfolio gallery")
     template_name = "portfolio/media/create.html"
 
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        self.file = MediaSourceFile.objects.get(pk=self.kwargs["pk"]).file
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
+
     def get_initial(self) -> dict[str, Any]:
         initial: dict[str, Any] = super().get_initial()
         initial["source"] = self.file
         return initial
-
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.file = MediaSourceFile.objects.get(pk=self.kwargs["pk"])
-        if request.headers.get("HX-Request"):
-            self.template_name = self.partial_template_name
 
 
 class MediaDeleteView(DeleteView):
@@ -78,20 +77,9 @@ class MediaDeleteView(DeleteView):
     template_name = "portfolio/media/delete.html"
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
         if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
-
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["title"] = f"Delete {self.get_object().title}"
-        return context
-
-    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not request.headers.get("HX-Request"):
-            return HttpResponse(status=403)
-        self.post(request, *args, **kwargs)
-        return HttpResponse(b"", status=200)
+        return super().setup(request, *args, **kwargs)
 
 
 class MediaUpdateView(UpdateView):
@@ -99,6 +87,7 @@ class MediaUpdateView(UpdateView):
     context_object_name = "media"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
     model = Media
+    queryset = Media.objects.all().exclude(hidden=True)
     fields = ["source", "thumb", "title", "subtitle", "desc", "is_hidden", "categories"]
     http_method_names = ["get", "post", "delete"]
     template_name = "portfolio/media/update.html"
@@ -106,15 +95,14 @@ class MediaUpdateView(UpdateView):
     success_url = reverse_lazy("portfolio gallery")
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.htmx_request = bool(request.headers.get("HX-Request"))
-        if self.htmx_request:
+        if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context: dict[str, Any] = super().get_context_data(**kwargs)
-        context["title"] = f"Update {self.get_object().title}"
-        return context
+    def get_queryset(self) -> QuerySet:
+        if self.request.user and self.request.user.is_staff:
+            return Media.objects.all()
+        return super().get_queryset()
 
     def get_success_url(self, media: Media | None = None) -> str:
         if media is not None:
@@ -123,10 +111,27 @@ class MediaUpdateView(UpdateView):
 
     def form_valid(self, form: forms.Form) -> HttpResponseRedirect:
         super().form_valid(form=form)
-        return HttpResponseRedirect(self.get_success_url(self.object))
+        media: Media = self.get_object()
+        return HttpResponseRedirect(self.get_success_url(media))
 
-    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        return HttpResponse(b"", status=200)
+
+class MediaCarouselView(ListView):
+    allow_empty = False
+    content_type = "text/html"
+    context_object_name = "carousel_item"
+    extra_context = {"profile": settings.PORTFOLIO_PROFILE}
+    http_method_names = ["get"]
+    model = Media
+    ordering = "date_created"
+    partial_template_name = "portfolio/media/_carousel.html"
+    queryset = Media.objects.all().exclude(is_hidden=True)
+    template_name = "portfolio/media/carousel.html"
+    paginate_by = 1
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
 
 
 class MediaGalleryView(ListView):
@@ -136,23 +141,21 @@ class MediaGalleryView(ListView):
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Gallery"}
     http_method_names = ["get"]
     model = Media
-    ordering = "-date_created"
+    ordering = "date_created"
     partial_template_name = "portfolio/media/_list.html"
-    queryset = Media.objects.all()
+    queryset = Media.objects.all().exclude(is_hidden=True)
     template_name = "portfolio/media/list.html"
     paginate_by = 12
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.htmx_request = bool(request.headers.get("HX-Request"))
-        if self.htmx_request:
+        if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
 
     def get_queryset(self) -> QuerySet:
-        queryset = Media.objects.all()
-        if not self.request.user or not self.request.user.is_staff:
-            queryset = queryset.exclude(is_hidden=True)
-        return queryset
+        if self.request.user and self.request.user.is_staff:
+            return Media.objects.all()
+        return super().get_queryset()
 
 
 class MediaSearchView(TemplateView):
@@ -163,9 +166,9 @@ class MediaSearchView(TemplateView):
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
         if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
 
 
 class MediaSearchResultsView(ListView):
@@ -175,12 +178,17 @@ class MediaSearchResultsView(ListView):
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
     http_method_names = ["get", "post", "delete"]
     model = Media
-    ordering = "-title"
-    queryset = Media.objects.exclude(is_hidden=True)
+    ordering = "title"
+    queryset = Media.objects.all().exclude(is_hidden=True)
     template_name = "portfolio/media/search.html"
     partial_template_name = "portfolio/media/partials/_search.html"
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
         if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
+
+    def get_queryset(self) -> QuerySet:
+        if self.request.user and self.request.user.is_staff:
+            return Media.objects.all()
+        return super().get_queryset()

@@ -1,5 +1,5 @@
-from django.http import HttpRequest, HttpResponse
 from django.conf import settings
+from django.http import HttpRequest
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -19,13 +19,18 @@ class SourceFileDetailView(LoginRequiredMixin, DetailView):
     extra_context = {"title": "File", "profile": settings.PORTFOLIO_PROFILE}
     fields = ["file"]
     http_method_names = ["get"]
-    template_name = "portfolio/files/detail.html"
-    partial_template_name = "portfolio/files/partials/_detail.html"
-    model = MediaSourceFile
-    queryset = MediaSourceFile.objects.all()
     login_url = reverse_lazy("portfolio login")
+    model = MediaSourceFile
+    partial_template_name = "portfolio/files/partials/_detail.html"
     permission_denied_message = "Please login and try again."
+    queryset = MediaSourceFile.objects.all()
     raise_exception = False
+    template_name = "portfolio/files/detail.html"
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        if request.headers.get("HX-Request"):
+            self.template_name = self.partial_template_name
+        return super().setup(request, *args, **kwargs)
 
 
 class SourceFileCreateView(CreateView):
@@ -33,29 +38,24 @@ class SourceFileCreateView(CreateView):
     context_object_name = "source_file"
     extra_context = {
         "title": "New File",
-        "profile": settings.PORTFOLIO_PROFILE,
-        "class": "p-8 mx-auto border-gray-600 border-dashed border-2 rounded-xl",
+        "profile": settings.PORTFOLIO_PROFILE,  # TODO: Get class from profile
+        "class": "p-4 bg-gray-800/45 border-4 border-dashed border-gray-500/80",
     }
     fields = ["file"]
     http_method_names = ["get", "post", "delete"]
-    template_name = "portfolio/files/create.html"
-    partial_template_name = "portfolio/files/partials/_create.html"
-    success_url = reverse_lazy("list files")
-    model = MediaSourceFile
-    queryset = MediaSourceFile.objects.all()
     login_url = reverse_lazy("portfolio login")
+    model = MediaSourceFile
+    partial_template_name = "portfolio/files/partials/_create.html"
     permission_denied_message = "Please login and try again."
+    queryset = MediaSourceFile.objects.all()
     raise_exception = False
+    success_url = reverse_lazy("list files")
+    template_name = "portfolio/files/create.html"
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
         if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
-
-    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not request.headers.get("HX-Request"):
-            return HttpResponse(status=403)
-        return HttpResponse(b"", status=200)
+        return super().setup(request, *args, **kwargs)
 
 
 class SourceFileDeleteView(DeleteView):
@@ -64,25 +64,19 @@ class SourceFileDeleteView(DeleteView):
     extra_context = {"title": "Delete File", "profile": settings.PORTFOLIO_PROFILE}
     fields = ["file"]
     http_method_names = ["get", "post", "delete"]
-    template_name = "portfolio/files/delete.html"
-    partial_template_name = "portfolio/files/partials/_delete.html"
-    success_url = reverse_lazy("delete file")
-    model = MediaSourceFile
-    queryset = MediaSourceFile.objects.all()
     login_url = reverse_lazy("portfolio login")
+    model = MediaSourceFile
+    partial_template_name = "portfolio/files/partials/_delete.html"
     permission_denied_message = "Please login and try again."
+    queryset = MediaSourceFile.objects.all()
     raise_exception = False
+    success_url = reverse_lazy("delete file")
+    template_name = "portfolio/files/delete.html"
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.htmx_request = bool(request.headers.get("HX-Request"))
-        if self.htmx_request:
+        if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
-
-    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not self.htmx_request:
-            return HttpResponse(status=403)
-        return HttpResponse(b"", status=200)
+        return super().setup(request, *args, **kwargs)
 
 
 class SourceFileUpdateView(UpdateView):
@@ -91,23 +85,17 @@ class SourceFileUpdateView(UpdateView):
     extra_context = {"title": "Update File", "profile": settings.PORTFOLIO_PROFILE}
     fields = ["file"]
     http_method_names = ["get", "post", "delete"]
-    partial_template_name = "portfolio/files/partials/_update.html"
-    success_url = reverse_lazy("update file")
-    template_name = "portfolio/files/update.html"
     login_url = reverse_lazy("portfolio login")
+    partial_template_name = "portfolio/files/partials/_update.html"
     permission_denied_message = "Please login and try again."
     raise_exception = False
+    success_url = reverse_lazy("update file")
+    template_name = "portfolio/files/update.html"
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.htmx_request = bool(request.headers.get("HX-Request"))
-        if self.htmx_request:
+        if request.headers.get("HX-Request"):
             self.template_name = self.partial_template_name
-
-    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
-        if not self.htmx_request:
-            return HttpResponse(status=403)
-        return HttpResponse(b"", status=200)
+        return super().setup(request, *args, **kwargs)
 
 
 class SourceFileListView(LoginRequiredMixin, ListView):
@@ -115,13 +103,14 @@ class SourceFileListView(LoginRequiredMixin, ListView):
     context_object_name = "source_files"
     extra_context = {"title": "Files", "profile": settings.PORTFOLIO_PROFILE}
     http_method_names = ["get", "post"]
-    model = MediaSourceFile
-    queryset = MediaSourceFile.objects.all()
     login_url = reverse_lazy("portfolio login")
+    model = MediaSourceFile
+    paginate_by = 25  # TODO: Implement pagination in default templates
+    partial_template_name = "portfolio/files/partials/_list.html"
     permission_denied_message = "Please login and try again."
+    queryset = MediaSourceFile.objects.all()
     raise_exception = False
     template_name = "portfolio/files/list.html"
-    partial_template_name = "portfolio/files/partials/_list.html"
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         if request.headers.get("HX-Request"):
