@@ -1,8 +1,8 @@
-<div class="absolute inset-0 bg-gray-300/80">
+<div class="absolute inset-0">
     <div class="flex h-screen flex-col items-center justify-center">
         <div class="relative">
-            <table class="w-full overflow-x-auto text-left text-sm text-gray-500 dark:text-gray-400">
-                <thead class="bg-gray-50 text-xs uppercase text-gray-700 dark:bg-gray-700 dark:text-gray-400">
+            <table class="w-full overflow-x-auto rounded text-left text-sm text-gray-500">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-700">
                     <tr>
                         <th scope="col" class="p-2">#</th>
                         <th scope="col" class="p-2">Name</th>
@@ -21,15 +21,15 @@
                         hx-get="{% url 'create file' %}"
                         hx-target="this"
                         hx-swap="outerHTML"
-                    >Loading...</tr>
+                    ></tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <div class="flex-inline group mt-4 flex cursor-pointer items-center gap-2 rounded bg-blue-500 px-6 py-4 hover:scale-105 hover:bg-blue-300" hx-get="{% url 'create file' %}" hx-trigger="click" hx-target="#files-table" hx-swap="beforeend">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-gray-200 group-hover:animate-pulse">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+            <div class="group mt-4 flex cursor-pointer items-center rounded bg-blue-500 px-6 py-4 text-gray-200 transition-transform duration-300 ease-in-out will-change-transform hover:scale-105" hx-get="{% url 'create file' %}" hx-trigger="click" hx-target="#files-table" hx-swap="beforeend">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>
-                <h2 class="text-xl text-gray-200">upload new file</h2>
+                <h2 class="text-xl">upload new file</h2>
             </div>
         </div>
     </div>

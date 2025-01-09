@@ -1,4 +1,4 @@
-from .public import ContactView, DropzoneView, PortfolioLoginView, PortfolioLogoutView
+from .public import ContactView, LoginView, LogoutView
 from .media import (
     MediaCreateView,
     MediaDeleteView,

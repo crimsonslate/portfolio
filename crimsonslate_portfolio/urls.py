@@ -3,12 +3,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("contact/", views.ContactView.as_view(), name="portfolio contact"),
-    path("gallery/", views.MediaGalleryView.as_view(), name="gallery media"),
-    path("search/", views.MediaSearchView.as_view(), name="search media"),
+    path("login/", views.LoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("contact/", views.ContactView.as_view(), name="contact"),
+    path("gallery/", views.MediaGalleryView.as_view(), name="gallery"),
+    path("search/", views.MediaSearchView.as_view(), name="search"),
     path("results/", views.MediaSearchResultsView.as_view(), name="search results"),
-    path("login/", views.PortfolioLoginView.as_view(), name="portfolio login"),
-    path("logout/", views.PortfolioLogoutView.as_view(), name="portfolio logout"),
     path("files/", views.SourceFileListView.as_view(), name="list files"),
     path("files/new/", views.SourceFileCreateView.as_view(), name="create file"),
     path("files/<int:pk>/", views.SourceFileDetailView.as_view(), name="detail file"),
