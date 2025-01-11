@@ -2,13 +2,12 @@ from django.conf import settings
 from django.contrib.auth.views import LoginView as LoginViewBase
 from django.contrib.auth.views import LogoutView as LogoutViewBase
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
 
 from crimsonslate_portfolio.forms import PortfolioAuthenticationForm
-from crimsonslate_portfolio.views.htmx import HtmxView
+from crimsonslate_portfolio.views.base import HtmxView
 
 
-class ContactView(TemplateView, HtmxView):
+class ContactView(HtmxView):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Contact"}
     http_method_names = ["get", "post"]

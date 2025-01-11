@@ -1,5 +1,7 @@
+from typing import Any
 from django.conf import settings
-from django.urls import reverse_lazy
+from django.http import HttpRequest, HttpResponse
+from django.urls import reverse_lazy, reverse
 from django.views.generic import (
     CreateView,
     DeleteView,
@@ -10,10 +12,10 @@ from django.views.generic import (
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from crimsonslate_portfolio.models import MediaSourceFile
-from crimsonslate_portfolio.views.htmx import HtmxView
+from crimsonslate_portfolio.views.base import HtmxView
 
 
-class SourceFileDetailView(LoginRequiredMixin, DetailView, HtmxView):
+class SourceFileDetailView(DetailView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     context_object_name = "source_file"
     extra_context = {"title": "File", "profile": settings.PORTFOLIO_PROFILE}
@@ -28,7 +30,7 @@ class SourceFileDetailView(LoginRequiredMixin, DetailView, HtmxView):
     template_name = "portfolio/files/detail.html"
 
 
-class SourceFileCreateView(LoginRequiredMixin, CreateView, HtmxView):
+class SourceFileCreateView(CreateView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     context_object_name = "source_file"
     extra_context = {
@@ -42,13 +44,25 @@ class SourceFileCreateView(LoginRequiredMixin, CreateView, HtmxView):
     model = MediaSourceFile
     partial_template_name = "portfolio/files/partials/_create.html"
     permission_denied_message = "Please login and try again."
-    queryset = MediaSourceFile.objects.all()
     raise_exception = False
     success_url = reverse_lazy("list files")
     template_name = "portfolio/files/create.html"
+    queryset = MediaSourceFile.objects.all()
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        self.object = None
+        return super().get_context_data(**kwargs)
+
+    def get_success_url(self, file: MediaSourceFile | None = None) -> str:
+        if file is not None:
+            return reverse(file.get_absolute_url())
+        return str(self.success_url)
+
+    def delete(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        return HttpResponse(status=200)
 
 
-class SourceFileDeleteView(LoginRequiredMixin, DeleteView, HtmxView):
+class SourceFileDeleteView(DeleteView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     context_object_name = "source_file"
     extra_context = {"title": "Delete File", "profile": settings.PORTFOLIO_PROFILE}
@@ -64,7 +78,7 @@ class SourceFileDeleteView(LoginRequiredMixin, DeleteView, HtmxView):
     template_name = "portfolio/files/delete.html"
 
 
-class SourceFileUpdateView(LoginRequiredMixin, UpdateView, HtmxView):
+class SourceFileUpdateView(UpdateView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     context_object_name = "source_file"
     extra_context = {"title": "Update File", "profile": settings.PORTFOLIO_PROFILE}
@@ -78,7 +92,7 @@ class SourceFileUpdateView(LoginRequiredMixin, UpdateView, HtmxView):
     template_name = "portfolio/files/update.html"
 
 
-class SourceFileListView(LoginRequiredMixin, ListView, HtmxView):
+class SourceFileListView(ListView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     context_object_name = "source_files"
     extra_context = {"title": "Files", "profile": settings.PORTFOLIO_PROFILE}
@@ -91,3 +105,7 @@ class SourceFileListView(LoginRequiredMixin, ListView, HtmxView):
     queryset = MediaSourceFile.objects.all()
     raise_exception = False
     template_name = "portfolio/files/list.html"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        self.object_list = super().get_queryset()
+        return super().get_context_data(**kwargs)

@@ -1,7 +1,10 @@
 from datetime import date
 
 from django.core.files.storage import storages
-from django.core.validators import get_available_image_extensions
+from django.core.validators import (
+    get_available_image_extensions,
+    validate_image_file_extension,
+)
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -11,18 +14,15 @@ from crimsonslate_portfolio.validators import validate_media_file_extension
 
 
 class MediaSourceFile(models.Model):
-    file = models.FileField(storage=storages["bucket"], upload_to="source/")
-    media = models.ForeignKey(
-        "crimsonslate_portfolio.Media",
-        blank=True,
-        default=None,
-        null=True,
-        on_delete=models.CASCADE,
-        validators=[validate_media_file_extension],
+    file = models.FileField(
+        storage=storages["bucket"], validators=[validate_media_file_extension]
     )
 
     def __str__(self) -> str:
-        return self.file.name
+        return str(self.file.name)
+
+    def get_absolute_url(self) -> str:
+        return reverse("detail file", kwargs={"pk": self.pk})
 
 
 class MediaCategory(models.Model):
@@ -50,15 +50,17 @@ class Media(models.Model):
         max_length=64,
         unique=True,
     )
-    source = models.FileField(
-        storage=storages["bucket"], validators=[validate_media_file_extension]
+    source = models.ForeignKey(
+        "crimsonslate_portfolio.MediaSourceFile", on_delete=models.CASCADE
     )
     thumb = models.ImageField(
-        verbose_name="thumbnail",
-        storage=storages["bucket"],
-        null=True,
         blank=True,
         default=None,
+        null=True,
+        storage=storages["bucket"],
+        upload_to="thumb/",
+        validators=[validate_image_file_extension],
+        verbose_name="thumbnail",
     )
     subtitle = models.CharField(max_length=128, blank=True, null=True, default=None)
     desc = models.TextField(
@@ -87,13 +89,9 @@ class Media(models.Model):
         return self.title
 
     def save(self, **kwargs) -> None:
+        self.is_image = self.file_extension in get_available_image_extensions()
         if not self.slug or self.slug != slugify(self.title):
             self.slug = slugify(self.title)
-
-        if self.file_extension in get_available_image_extensions():
-            self.is_image = True
-        else:
-            self.is_image = False
         return super().save(**kwargs)
 
     def get_absolute_url(self) -> str:
@@ -101,8 +99,8 @@ class Media(models.Model):
 
     @property
     def file_extension(self) -> str:
-        return self.source.file.name.split(".")[-1]
+        return self.source.file.name.split(".")[-1] if self.source else ""
 
     @property
     def url(self) -> str:
-        return self.source.url
+        return self.source.file.url

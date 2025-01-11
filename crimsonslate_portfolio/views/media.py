@@ -11,13 +11,12 @@ from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
-    TemplateView,
     UpdateView,
     ListView,
 )
 
 from crimsonslate_portfolio.models import Media, MediaSourceFile
-from crimsonslate_portfolio.views.htmx import HtmxView
+from crimsonslate_portfolio.views.base import HtmxView
 
 
 class MediaDetailView(DetailView, HtmxView):
@@ -40,7 +39,7 @@ class MediaDetailView(DetailView, HtmxView):
         return context
 
 
-class MediaCreateView(LoginRequiredMixin, CreateView, HtmxView):
+class MediaCreateView(CreateView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE, "title": "Create"}
     fields = ["source", "thumb", "title", "subtitle", "desc", "is_hidden", "categories"]
@@ -52,15 +51,15 @@ class MediaCreateView(LoginRequiredMixin, CreateView, HtmxView):
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
-        self.file: File = MediaSourceFile.objects.get(pk=self.kwargs["pk"])
+        self.source: File = MediaSourceFile.objects.get(pk=self.kwargs["pk"])
 
     def get_initial(self) -> dict[str, Any]:
         initial: dict[str, Any] = super().get_initial()
-        initial["source"] = self.file
+        initial["source"] = self.source
         return initial
 
 
-class MediaDeleteView(LoginRequiredMixin, DeleteView, HtmxView):
+class MediaDeleteView(DeleteView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
     http_method_names = ["get", "post", "delete"]
@@ -70,7 +69,7 @@ class MediaDeleteView(LoginRequiredMixin, DeleteView, HtmxView):
     template_name = "portfolio/media/delete.html"
 
 
-class MediaUpdateView(LoginRequiredMixin, UpdateView, HtmxView):
+class MediaUpdateView(UpdateView, HtmxView, LoginRequiredMixin):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
     fields = ["source", "thumb", "title", "subtitle", "desc", "is_hidden", "categories"]
@@ -88,7 +87,7 @@ class MediaUpdateView(LoginRequiredMixin, UpdateView, HtmxView):
 
     def get_success_url(self, media: Media | None = None) -> str:
         if media is not None:
-            return reverse("media detail", kwargs={"slug": media.slug})
+            return reverse("detail media", kwargs={"slug": media.slug})
         return super().get_success_url()
 
     def form_valid(self, form: forms.Form) -> HttpResponseRedirect:
@@ -119,9 +118,9 @@ class MediaGalleryView(ListView, HtmxView):
     model = Media
     ordering = "date_created"
     paginate_by = 12
-    partial_template_name = "portfolio/media/partials/_list.html"
+    partial_template_name = "portfolio/media/partials/_gallery.html"
     queryset = Media.objects.all().exclude(is_hidden=True)
-    template_name = "portfolio/media/list.html"
+    template_name = "portfolio/media/gallery.html"
 
     def get_queryset(self) -> QuerySet:
         if self.request.user and self.request.user.is_staff:
@@ -129,7 +128,7 @@ class MediaGalleryView(ListView, HtmxView):
         return super().get_queryset()
 
 
-class MediaSearchView(TemplateView, HtmxView):
+class MediaSearchView(HtmxView):
     content_type = "text/html"
     extra_context = {"profile": settings.PORTFOLIO_PROFILE}
     http_method_names = ["get"]
