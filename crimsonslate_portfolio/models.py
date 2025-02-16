@@ -13,18 +13,6 @@ from django.utils.text import slugify
 from crimsonslate_portfolio.validators import validate_media_file_extension
 
 
-class MediaSourceFile(models.Model):
-    file = models.FileField(
-        storage=storages["bucket"], validators=[validate_media_file_extension]
-    )
-
-    def __str__(self) -> str:
-        return str(self.file.name)
-
-    def get_absolute_url(self) -> str:
-        return reverse("detail file", kwargs={"pk": self.pk})
-
-
 class MediaCategory(models.Model):
     name = models.CharField(max_length=64)
     cover = models.ImageField(
@@ -42,7 +30,7 @@ class MediaCategory(models.Model):
         verbose_name_plural = "categories"
 
     def __str__(self) -> str:
-        return self.name
+        return str(self.name)
 
 
 class Media(models.Model):
@@ -50,8 +38,10 @@ class Media(models.Model):
         max_length=64,
         unique=True,
     )
-    source = models.ForeignKey(
-        "crimsonslate_portfolio.MediaSourceFile", on_delete=models.CASCADE
+    source = models.FileField(
+        storage=storages["bucket"],
+        upload_to="source/",
+        validators=[validate_media_file_extension],
     )
     thumb = models.ImageField(
         blank=True,
@@ -70,11 +60,11 @@ class Media(models.Model):
         max_length=64, unique=True, blank=True, null=True, default=None
     )
     is_hidden = models.BooleanField(default=False)
-    is_image = models.BooleanField(default=None, blank=True, null=True)
+    is_image = models.BooleanField(blank=True, null=True, editable=False)
     categories = models.ManyToManyField("MediaCategory", default=None, blank=True)
 
     date_created = models.DateField(default=date.today)
-    datetime_published = models.DateTimeField(default=timezone.now)
+    datetime_published = models.DateTimeField(default=timezone.now, editable=False)
 
     class Meta:
         ordering = ["date_created"]
@@ -86,10 +76,11 @@ class Media(models.Model):
         ]
 
     def __str__(self) -> str:
-        return self.title
+        return str(self.title)
 
     def save(self, **kwargs) -> None:
-        self.is_image = self.file_extension in get_available_image_extensions()
+        if self.is_image is None:
+            self.is_image = self.file_extension in get_available_image_extensions()
         if not self.slug or self.slug != slugify(self.title):
             self.slug = slugify(self.title)
         return super().save(**kwargs)
@@ -98,9 +89,5 @@ class Media(models.Model):
         return reverse("detail media", kwargs={"slug": self.slug})
 
     @property
-    def file_extension(self) -> str:
-        return self.source.file.name.split(".")[-1] if self.source else ""
-
-    @property
-    def url(self) -> str:
-        return self.source.file.url
+    def file_extension(self) -> str | None:
+        return self.source.file.name.split(".")[-1] if self.source else None
