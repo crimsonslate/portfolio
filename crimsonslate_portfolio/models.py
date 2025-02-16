@@ -16,12 +16,12 @@ from crimsonslate_portfolio.validators import validate_media_file_extension
 class MediaCategory(models.Model):
     name = models.CharField(max_length=64)
     cover = models.ImageField(
-        verbose_name="cover image",
-        storage=storages["bucket"],
-        upload_to="category/",
-        null=True,
         blank=True,
         default=None,
+        null=True,
+        storage=storages["bucket"],
+        upload_to="category/",
+        verbose_name="cover image",
     )
 
     class Meta:
