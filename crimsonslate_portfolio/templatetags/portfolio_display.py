@@ -15,6 +15,6 @@ def display(
         "title": media.title,
         "class": css_class,
         "image": force_image if force_image else media.is_image,
-        "src": media.source.file.url,
+        "src": media.source.url,
         "detail_url": media.get_absolute_url(),
     }

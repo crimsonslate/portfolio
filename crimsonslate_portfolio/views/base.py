@@ -1,9 +1,13 @@
 from typing import Any
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.views.generic import TemplateView
 from django.views.generic.base import ContextMixin
+
+if not hasattr(settings, "PORTFOLIO_PROFILE"):
+    raise ImproperlyConfigured("'PORTFOLIO_PROFILE' setting is required.")
 
 
 class PortfolioProfileMixin(ContextMixin):
@@ -15,12 +19,12 @@ class PortfolioProfileMixin(ContextMixin):
         return context
 
 
-class HtmxView(TemplateView):
-    """Enables htmx features."""
+class HtmxTemplateView(TemplateView):
+    """A template view that enables htmx features."""
 
     partial_template_name: str = ""
     """
-    A partial template to be rendered by HTMX.
+    A partial template rendered by htmx.
 
     :type: :py:obj:`str`
     :value: ``""``

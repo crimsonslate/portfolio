@@ -1,9 +1,9 @@
 from typing import Any
 
 from django import forms
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import QuerySet
-from django.core.files import File
-from django.http import HttpRequest, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -13,11 +13,30 @@ from django.views.generic import (
     ListView,
 )
 
-from crimsonslate_portfolio.models import Media, MediaSourceFile
-from crimsonslate_portfolio.views.base import HtmxView, PortfolioProfileMixin
+from crimsonslate_portfolio.models import Media
+from crimsonslate_portfolio.views.base import HtmxTemplateView, PortfolioProfileMixin
 
 
-class MediaDetailView(DetailView, HtmxView, PortfolioProfileMixin):
+class MediaUploadView(LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateView):
+    content_type = "text/html"
+    http_method_names = ["get"]
+    extra_context = {"title": "Upload", "class": "bg-violet-100"}
+    template_name = "portfolio/media/upload.html"
+    partial_template_name = "portfolio/media/partials/_upload.html"
+    login_url = reverse_lazy("login")
+    raise_exception = True
+    permission_denied_message = "Please login and try again."
+
+
+class MediaUploadSuccessView(PortfolioProfileMixin, HtmxTemplateView):
+    content_type = "text/html"
+    http_method_names = ["get"]
+    extra_context = {"title": "Success", "class": ""}
+    template_name = "portfolio/media/upload_success.html"
+    partial_template_name = "portfolio/media/partials/_upload_success.html"
+
+
+class MediaDetailView(DetailView, HtmxTemplateView, PortfolioProfileMixin):
     content_type = "text/html"
     http_method_names = ["get"]
     model = Media
@@ -31,31 +50,26 @@ class MediaDetailView(DetailView, HtmxView, PortfolioProfileMixin):
         return self.queryset
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
-        self.object = self.get_queryset().get(slug=self.kwargs["slug"])
+        self.object = self.get_object()
         return super().get_context_data(**kwargs)
 
 
-class MediaCreateView(CreateView, HtmxView, PortfolioProfileMixin):
+class MediaCreateView(CreateView, HtmxTemplateView, PortfolioProfileMixin):
     content_type = "text/html"
-    extra_context = {"title": "Create"}
+    extra_context = {"title": "Create", "class": "flex flex-col gap-2 p-4"}
     fields = ["source", "thumb", "title", "subtitle", "desc", "is_hidden", "categories"]
     http_method_names = ["get", "post", "delete"]
     model = Media
     partial_template_name = "portfolio/media/partials/_create.html"
-    success_url = reverse_lazy("gallery")
     template_name = "portfolio/media/create.html"
+    success_url = reverse_lazy("upload success")
 
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        self.source: File = MediaSourceFile.objects.get(pk=self.kwargs["pk"])
-
-    def get_initial(self) -> dict[str, Any]:
-        initial: dict[str, Any] = super().get_initial()
-        initial["source"] = self.source
-        return initial
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        self.object = None
+        return super().get_context_data(**kwargs)
 
 
-class MediaDeleteView(DeleteView, HtmxView, PortfolioProfileMixin):
+class MediaDeleteView(DeleteView, HtmxTemplateView, PortfolioProfileMixin):
     content_type = "text/html"
     http_method_names = ["get", "post", "delete"]
     model = Media
@@ -64,7 +78,7 @@ class MediaDeleteView(DeleteView, HtmxView, PortfolioProfileMixin):
     template_name = "portfolio/media/delete.html"
 
 
-class MediaUpdateView(UpdateView, HtmxView, PortfolioProfileMixin):
+class MediaUpdateView(UpdateView, HtmxTemplateView, PortfolioProfileMixin):
     content_type = "text/html"
     fields = ["source", "thumb", "title", "subtitle", "desc", "is_hidden", "categories"]
     http_method_names = ["get", "post", "delete"]
@@ -90,20 +104,20 @@ class MediaUpdateView(UpdateView, HtmxView, PortfolioProfileMixin):
         return HttpResponseRedirect(self.get_success_url(media))
 
 
-class MediaCarouselView(ListView, HtmxView, PortfolioProfileMixin):
+class MediaCarouselView(ListView, HtmxTemplateView, PortfolioProfileMixin):
     allow_empty = False
     content_type = "text/html"
     context_object_name = "carousel_item"
     http_method_names = ["get"]
     model = Media
     ordering = "date_created"
-    paginate_by = 1
+    paginate_by = 3
     partial_template_name = "portfolio/media/partials/_carousel.html"
     queryset = Media.objects.all().exclude(is_hidden=True)
     template_name = "portfolio/media/carousel.html"
 
 
-class MediaGalleryView(ListView, HtmxView, PortfolioProfileMixin):
+class MediaGalleryView(ListView, HtmxTemplateView, PortfolioProfileMixin):
     allow_empty = True
     content_type = "text/html"
     extra_context = {"title": "Gallery"}
@@ -125,7 +139,7 @@ class MediaGalleryView(ListView, HtmxView, PortfolioProfileMixin):
         return super().get_context_data(**kwargs)
 
 
-class MediaSearchView(HtmxView, PortfolioProfileMixin):
+class MediaSearchView(HtmxTemplateView, PortfolioProfileMixin):
     content_type = "text/html"
     http_method_names = ["get"]
     extra_context = {"title": "Search"}
@@ -133,7 +147,7 @@ class MediaSearchView(HtmxView, PortfolioProfileMixin):
     template_name = "portfolio/media/search.html"
 
 
-class MediaSearchResultsView(ListView, HtmxView, PortfolioProfileMixin):
+class MediaSearchResultsView(ListView, HtmxTemplateView, PortfolioProfileMixin):
     allow_empty = True
     content_type = "text/html"
     context_object_name = "search_results"

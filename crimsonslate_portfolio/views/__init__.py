@@ -1,4 +1,4 @@
-from .public import ContactView, LoginView, LogoutView
+from .generic import ContactView, LoginView, LogoutView
 from .media import (
     MediaCreateView,
     MediaDeleteView,
@@ -7,11 +7,6 @@ from .media import (
     MediaSearchResultsView,
     MediaSearchView,
     MediaUpdateView,
-)
-from .source_files import (
-    SourceFileCreateView,
-    SourceFileDeleteView,
-    SourceFileUpdateView,
-    SourceFileListView,
-    SourceFileDetailView,
+    MediaUploadView,
+    MediaUploadSuccessView,
 )
