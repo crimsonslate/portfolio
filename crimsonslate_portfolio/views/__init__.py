@@ -4,7 +4,6 @@ from .media import (
     MediaDeleteView,
     MediaDetailView,
     MediaGalleryView,
-    MediaSearchResultsView,
     MediaSearchView,
     MediaUpdateView,
     MediaUploadView,

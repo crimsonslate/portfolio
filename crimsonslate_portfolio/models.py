@@ -79,8 +79,7 @@ class Media(models.Model):
         return str(self.title)
 
     def save(self, **kwargs) -> None:
-        if self.is_image is None:
-            self.is_image = self.file_extension in get_available_image_extensions()
+        self.is_image = self.file_extension in get_available_image_extensions()
         if not self.slug or self.slug != slugify(self.title):
             self.slug = slugify(self.title)
         return super().save(**kwargs)

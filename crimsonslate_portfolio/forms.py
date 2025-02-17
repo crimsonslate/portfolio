@@ -9,11 +9,11 @@ class PortfolioAuthenticationForm(AuthenticationForm):
         super().__init__(*args, **kwargs)
         for name in self.fields:
             self.fields[name].widget.attrs.update(
-                {"class": "p-2 rounded", "placeholder": name.title()}
+                {"class": "p-2 rounded bg-white", "placeholder": name.title()}
             )
 
 
-class MediaCreationForm(ModelForm):
+class MediaCreateForm(ModelForm):
     class Meta:
         model = Media
         fields = [
@@ -28,7 +28,7 @@ class MediaCreationForm(ModelForm):
         ]
 
 
-class MediaEditForm(ModelForm):
+class MediaUpdateForm(ModelForm):
     class Meta:
         model = Media
         fields = [

@@ -10,14 +10,11 @@ urlpatterns = [
     path("contact/", views.ContactView.as_view(), name="contact"),
     path("gallery/", views.MediaGalleryView.as_view(), name="gallery"),
     path("search/", views.MediaSearchView.as_view(), name="search"),
-    path(
-        "search/results/", views.MediaSearchResultsView.as_view(), name="search results"
-    ),
-    path("media/create/", views.MediaCreateView.as_view(), name="create media"),
     path("upload/", views.MediaUploadView.as_view(), name="upload media"),
     path(
         "upload/success/", views.MediaUploadSuccessView.as_view(), name="upload success"
     ),
+    path("media-creation/", views.MediaCreateView.as_view(), name="create media"),
     path("<str:slug>/", views.MediaDetailView.as_view(), name="detail media"),
     path("<str:slug>/delete/", views.MediaDeleteView.as_view(), name="delete media"),
     path("<str:slug>/update/", views.MediaUpdateView.as_view(), name="update media"),
