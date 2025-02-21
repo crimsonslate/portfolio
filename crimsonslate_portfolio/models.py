@@ -13,9 +13,9 @@ from django.utils.text import slugify
 from crimsonslate_portfolio.validators import validate_media_file_extension
 
 
-class MediaCategory(models.Model):
+class MediaTag(models.Model):
     name = models.CharField(max_length=64)
-    cover = models.ImageField(
+    icon = models.ImageField(
         blank=True,
         default=None,
         null=True,
@@ -26,8 +26,8 @@ class MediaCategory(models.Model):
 
     class Meta:
         ordering = ["name"]
-        verbose_name = "category"
-        verbose_name_plural = "categories"
+        verbose_name = "tag"
+        verbose_name_plural = "tags"
 
     def __str__(self) -> str:
         return str(self.name)
@@ -44,9 +44,6 @@ class Media(models.Model):
         validators=[validate_media_file_extension],
     )
     thumb = models.ImageField(
-        blank=True,
-        default=None,
-        null=True,
         storage=storages["bucket"],
         upload_to="thumb/",
         validators=[validate_image_file_extension],
@@ -61,7 +58,7 @@ class Media(models.Model):
     )
     is_hidden = models.BooleanField(default=False)
     is_image = models.BooleanField(blank=True, null=True, editable=False)
-    categories = models.ManyToManyField("MediaCategory", default=None, blank=True)
+    tags = models.ManyToManyField("MediaTag", default=None, blank=True)
 
     date_created = models.DateField(default=date.today)
     datetime_published = models.DateTimeField(default=timezone.now, editable=False)
@@ -88,5 +85,5 @@ class Media(models.Model):
         return reverse("detail media", kwargs={"slug": self.slug})
 
     @property
-    def file_extension(self) -> str | None:
-        return self.source.file.name.split(".")[-1] if self.source else None
+    def file_extension(self) -> str:
+        return self.source.file.name.split(".")[-1]

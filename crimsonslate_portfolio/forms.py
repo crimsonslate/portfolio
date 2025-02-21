@@ -23,7 +23,7 @@ class MediaCreateForm(ModelForm):
             "subtitle",
             "desc",
             "is_hidden",
-            "categories",
+            "tags",
             "date_created",
         ]
 
@@ -38,6 +38,6 @@ class MediaUpdateForm(ModelForm):
             "subtitle",
             "desc",
             "is_hidden",
-            "categories",
+            "tags",
             "date_created",
         ]

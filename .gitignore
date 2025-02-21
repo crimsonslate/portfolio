@@ -5,6 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
+migrations/
+!migrations/i
 
 # Virtual environments
 .venv
