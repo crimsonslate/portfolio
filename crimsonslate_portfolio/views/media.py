@@ -46,14 +46,12 @@ class MediaDeleteView(
     http_method_names = ["get", "post"]
 
 
-class MediaCreateView(
-    CreateView, HtmxTemplateView, PortfolioSingleObjectMixin, PortfolioProfileMixin
-):
-    model = Media
-    template_name = "portfolio/media/create.html"
-    partial_template_name = "portfolio/media/partials/_create.html"
-    http_method_names = ["get", "post"]
+class MediaCreateView(CreateView, HtmxTemplateView, PortfolioProfileMixin):
     form_class = MediaCreateForm
+    http_method_names = ["get", "post"]
+    model = Media
+    partial_template_name = "portfolio/media/partials/_create.html"
+    template_name = "portfolio/media/create.html"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         self.object = None
@@ -63,11 +61,11 @@ class MediaCreateView(
 class MediaUpdateView(
     UpdateView, HtmxTemplateView, PortfolioSingleObjectMixin, PortfolioProfileMixin
 ):
-    model = Media
-    template_name = "portfolio/media/update.html"
-    partial_template_name = "portfolio/media/partials/_update.html"
     form_class = MediaUpdateForm
     http_method_names = ["get", "post"]
+    model = Media
+    partial_template_name = "portfolio/media/partials/_update.html"
+    template_name = "portfolio/media/update.html"
 
 
 class MediaDetailView(

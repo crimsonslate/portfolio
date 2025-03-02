@@ -52,12 +52,13 @@ class HtmxTemplateView(TemplateView):
 
 
 class PortfolioSingleObjectMixin(SingleObjectMixin):
-    def get_queryset(self) -> QuerySet:
-        queryset = self.queryset.all()
+    def get_queryset(self) -> QuerySet | None:
+        if self.queryset is not None:
+            queryset = self.queryset.all()
 
-        if self.request.user and self.request.user.is_staff:
-            return queryset
-        return queryset.exclude(is_hidden=True)
+            if self.request.user and self.request.user.is_staff:
+                return queryset
+            return queryset.exclude(is_hidden=True)
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         self.object = self.get_object()
@@ -65,12 +66,13 @@ class PortfolioSingleObjectMixin(SingleObjectMixin):
 
 
 class PortfolioMultipleObjectMixin(MultipleObjectMixin):
-    def get_queryset(self) -> QuerySet:
-        queryset = self.queryset.all()
+    def get_queryset(self) -> QuerySet | None:
+        if self.queryest is not None:
+            queryset = self.queryset.all()
 
-        if self.request.user and self.request.user.is_staff:
-            return queryset
-        return queryset.exclude(is_hidden=True)
+            if self.request.user and self.request.user.is_staff:
+                return queryset
+            return queryset.exclude(is_hidden=True)
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         self.object_list = self.get_queryset()
