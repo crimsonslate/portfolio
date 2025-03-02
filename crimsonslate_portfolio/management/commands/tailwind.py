@@ -55,57 +55,6 @@ class Command(BaseCommand):
         subparsers.add_parser("start", help="Start tailwind compiler")
         subparsers.add_parser("build", help="Compile tailwind for production")
 
-    def generate_command(self, subcommand: str | None) -> str:
-        """
-        Generates a tailwind command based on the provided subcommand.
-
-        :returns: A command to be executed by :py:func:`os.system`.
-        :rtype: :py:obj:`str`
-
-        """
-        command = f"npx @tailwindcss/cli -i {settings.TAILWIND_INPUT_PATH} -o {settings.TAILWIND_OUTPUT_PATH}"
-        match subcommand:
-            case "start":
-                styled = self.style.NOTICE
-                message = "Starting tailwind compiler..."
-                command += " --watch"
-            case "build":
-                styled = self.style.NOTICE
-                message = "Compiling tailwind for production..."
-                command += " --minify"
-            case "install":
-                deps = self.get_package_dependencies()
-                if "tailwindcss" not in deps:
-                    styled = self.style.NOTICE
-                    message = "Installing tailwind..."
-                    command = "npm install -D tailwindcss @tailwindcss/cli"
-                else:
-                    styled = self.style.WARNING
-                    message = "Tailwind is already installed, building for production instead..."
-                    command += " --minify"
-            case _:
-                raise ValueError(f"Invalid subcommand: '{subcommand}'.")
-        self.stdout.write(styled(message))
-        return command
-
-    def get_package_dependencies(self) -> list[str]:
-        """
-        Retrives a list of application dependencies from ``package.json``.
-
-        Returns an empty list if ``package.json`` does not exist.
-
-        :returns: A list of application dependencies as strings.
-        :rtype: :py:obj:`list`
-
-        """
-        dependencies: list[str] = []
-        if not os.path.isfile("package.json"):
-            return dependencies
-
-        with open("package.json", "r") as file:
-            dependencies.extend(json.load(file).get("devDependencies", {}).keys())
-        return dependencies
-
     def handle(self, *args, **options):
         """
         Handles command execution based on the provided subcommand.
@@ -121,3 +70,62 @@ class Command(BaseCommand):
             os.system(command)
         except ValueError as e:
             raise CommandError(e)
+
+    def generate_command(self, subcommand: str | None) -> str:
+        """
+        Generates a tailwind command based on the provided subcommand.
+
+        :returns: A command to be executed by :py:func:`os.system`.
+        :rtype: :py:obj:`str`
+
+        """
+        command = f"npx @tailwindcss/cli -i {settings.TAILWIND_INPUT_PATH} -o {settings.TAILWIND_OUTPUT_PATH} "
+        match subcommand:
+            case "start":
+                styled = self.style.NOTICE
+                message = "Starting tailwind compiler..."
+                command += "--watch"
+            case "build":
+                styled = self.style.NOTICE
+                message = "Compiling tailwind for production..."
+                command += "--minify"
+            case "install":
+                if self.node_package_installed("tailwind"):
+                    styled = self.style.WARNING
+                    message = "Tailwind is already installed, building for production instead..."
+                    command += "--minify"
+                else:
+                    styled = self.style.NOTICE
+                    message = "Installing tailwind..."
+                    command = "npm install -D tailwindcss @tailwindcss/cli"
+            case _:
+                raise ValueError(f"Invalid subcommand: '{subcommand}'.")
+        self.stdout.write(styled(message))
+        return command
+
+    def get_node_dependencies(self) -> list[str]:
+        """
+        Retrives a list of npm dependencies from ``package.json``.
+
+        Returns an empty list if ``package.json`` does not exist.
+
+        :returns: A list of application dependencies as strings.
+        :rtype: :py:obj:`list`
+
+        """
+        dependencies: list[str] = []
+        if not os.path.isfile("package.json"):
+            return dependencies
+
+        with open("package.json", "r") as file:
+            dependencies.extend(json.load(file).get("devDependencies", {}).keys())
+        return dependencies
+
+    def node_package_installed(self, name: str) -> bool:
+        """
+        Whether or not a node package is installed.
+
+        :type: :py:obj:`bool`
+
+        """
+        return name in self.get_node_dependencies()
