@@ -26,7 +26,7 @@ class MediaUploadView(LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateVie
     template_name = "portfolio/media/upload.html"
     partial_template_name = "portfolio/media/partials/_upload.html"
     login_url = reverse_lazy("login")
-    raise_exception = True
+    raise_exception = False
     permission_denied_message = "Please login and try again."
 
 
