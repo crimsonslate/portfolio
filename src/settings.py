@@ -21,6 +21,12 @@ WSGI_APPLICATION = "src.wsgi.application"
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 S3_UPLOAD_BUCKET_NAME = "crimsonslate-bucket"
 S3_UPLOAD_REGION = "us-east-1"
+TAILWIND_INPUT_PATH = (
+    "./crimsonslate_portfolio/static/crimsonslate_portfolio/css/input.css"
+)
+TAILWIND_OUTPUT_PATH = (
+    "./crimsonslate_portfolio/static/crimsonslate_portfolio/css/output.css"
+)
 
 
 PORTFOLIO_PROFILE = {
