@@ -15,14 +15,7 @@ from crimsonslate_portfolio.validators import validate_media_file_extension
 
 class MediaTag(models.Model):
     name = models.CharField(max_length=64)
-    icon = models.ImageField(
-        blank=True,
-        default=None,
-        null=True,
-        storage=storages["bucket"],
-        upload_to="category/",
-        verbose_name="cover image",
-    )
+    emoji = models.CharField(max_length=1, null=True, blank=True, default=None)
 
     class Meta:
         ordering = ["name"]
