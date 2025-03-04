@@ -2,7 +2,6 @@ import argparse
 import json
 import os
 
-from django.conf import ImproperlyConfigured, settings
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -10,25 +9,13 @@ class Command(BaseCommand):
     help = "Runs the tailwind compiler"
 
     def __init__(self, *args, **kwargs) -> None:
-        """
-        Ensures necessary settings are set before calling the command.
-
-        :raises CommandError: If :py:confval:`TAILWIND_INPUT` was not set.
-        :raises CommandError: If :py:confval:`TAILWIND_OUTPUT` was not set.
-        :returns: Nothing.
-        :rtype: :py:obj:`None`
-
-        """
-        try:
-            if not hasattr(settings, "TAILWIND_INPUT_PATH"):
-                raise ImproperlyConfigured("'TAILWIND_INPUT_PATH' setting is required.")
-            if not hasattr(settings, "TAILWIND_OUTPUT_PATH"):
-                raise ImproperlyConfigured(
-                    "'TAILWIND_OUTPUT_PATH' setting is required."
-                )
-            super().__init__(*args, **kwargs)
-        except ImproperlyConfigured as e:
-            raise CommandError(e)
+        super().__init__(*args, **kwargs)
+        self.input_filepath = (
+            "./crimsonslate_portfolio/static/crimsonslate_portfolio/css/input.css"
+        )
+        self.output_filepath = (
+            "./crimsonslate_portfolio/static/crimsonslate_portfolio/css/output.css"
+        )
 
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -79,7 +66,9 @@ class Command(BaseCommand):
         :rtype: :py:obj:`str`
 
         """
-        command = f"npx @tailwindcss/cli -i {settings.TAILWIND_INPUT_PATH} -o {settings.TAILWIND_OUTPUT_PATH} "
+        command = (
+            f"npx @tailwindcss/cli -i {self.input_filepath} -o {self.output_filepath} "
+        )
         match subcommand:
             case "start":
                 styled = self.style.NOTICE
@@ -100,6 +89,7 @@ class Command(BaseCommand):
                     command = "npm install -D tailwindcss @tailwindcss/cli"
             case _:
                 raise ValueError(f"Invalid subcommand: '{subcommand}'.")
+
         self.stdout.write(styled(message))
         return command
 
