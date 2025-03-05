@@ -1,26 +1,27 @@
-from typing import Any
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
     DeleteView,
     DetailView,
+    TemplateView,
     UpdateView,
     ListView,
 )
 
-from crimsonslate_portfolio.models import Media
 from crimsonslate_portfolio.forms import MediaCreateForm, MediaUpdateForm
-from crimsonslate_portfolio.views.base import (
-    HtmxTemplateView,
+from crimsonslate_portfolio.models import Media
+from crimsonslate_portfolio.views.mixins import (
+    HtmxTemplateResponseMixin,
     PortfolioProfileMixin,
     PortfolioSingleObjectMixin,
     PortfolioMultipleObjectMixin,
 )
 
 
-class MediaUploadView(LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateView):
+class MediaUploadView(
+    LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView
+):
     http_method_names = ["get"]
     extra_context = {"title": "Upload", "class": "bg-violet-300"}
     template_name = "portfolio/media/upload.html"
@@ -30,7 +31,9 @@ class MediaUploadView(LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateVie
     permission_denied_message = "Please login and try again."
 
 
-class MediaUploadSuccessView(HtmxTemplateView, PortfolioProfileMixin):
+class MediaUploadSuccessView(
+    HtmxTemplateResponseMixin, PortfolioProfileMixin, TemplateView
+):
     http_method_names = ["get"]
     extra_context = {"title": "Success", "class": ""}
     template_name = "portfolio/media/upload_success.html"
@@ -38,7 +41,10 @@ class MediaUploadSuccessView(HtmxTemplateView, PortfolioProfileMixin):
 
 
 class MediaDeleteView(
-    DeleteView, HtmxTemplateView, PortfolioSingleObjectMixin, PortfolioProfileMixin
+    HtmxTemplateResponseMixin,
+    PortfolioSingleObjectMixin,
+    PortfolioProfileMixin,
+    DeleteView,
 ):
     model = Media
     template_name = "portfolio/media/delete.html"
@@ -46,20 +52,19 @@ class MediaDeleteView(
     http_method_names = ["get", "post"]
 
 
-class MediaCreateView(CreateView, HtmxTemplateView, PortfolioProfileMixin):
+class MediaCreateView(HtmxTemplateResponseMixin, PortfolioProfileMixin, CreateView):
     form_class = MediaCreateForm
     http_method_names = ["get", "post"]
     model = Media
     partial_template_name = "portfolio/media/partials/_create.html"
     template_name = "portfolio/media/create.html"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        self.object = None
-        return super().get_context_data(**kwargs)
-
 
 class MediaUpdateView(
-    UpdateView, HtmxTemplateView, PortfolioSingleObjectMixin, PortfolioProfileMixin
+    HtmxTemplateResponseMixin,
+    PortfolioSingleObjectMixin,
+    PortfolioProfileMixin,
+    UpdateView,
 ):
     form_class = MediaUpdateForm
     http_method_names = ["get", "post"]
@@ -69,7 +74,10 @@ class MediaUpdateView(
 
 
 class MediaDetailView(
-    DetailView, HtmxTemplateView, PortfolioSingleObjectMixin, PortfolioProfileMixin
+    HtmxTemplateResponseMixin,
+    PortfolioSingleObjectMixin,
+    PortfolioProfileMixin,
+    DetailView,
 ):
     http_method_names = ["get"]
     model = Media
@@ -79,7 +87,10 @@ class MediaDetailView(
 
 
 class MediaGalleryView(
-    ListView, HtmxTemplateView, PortfolioMultipleObjectMixin, PortfolioProfileMixin
+    HtmxTemplateResponseMixin,
+    PortfolioMultipleObjectMixin,
+    PortfolioProfileMixin,
+    ListView,
 ):
     allow_empty = True
     extra_context = {"title": "Gallery"}
@@ -93,7 +104,10 @@ class MediaGalleryView(
 
 
 class MediaSearchView(
-    ListView, HtmxTemplateView, PortfolioMultipleObjectMixin, PortfolioProfileMixin
+    HtmxTemplateResponseMixin,
+    PortfolioMultipleObjectMixin,
+    PortfolioProfileMixin,
+    ListView,
 ):
     allow_empty = True
     extra_context = {"title": "Search"}

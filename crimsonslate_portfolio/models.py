@@ -57,7 +57,7 @@ class Media(models.Model):
     datetime_published = models.DateTimeField(default=timezone.now, editable=False)
 
     class Meta:
-        ordering = ["date_created"]
+        ordering = ["-date_created"]
         constraints = [
             models.UniqueConstraint(
                 fields=["title", "slug"],

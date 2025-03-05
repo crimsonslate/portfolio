@@ -1,12 +1,16 @@
 from django.contrib.auth.views import LoginView as LoginViewBase
 from django.contrib.auth.views import LogoutView as LogoutViewBase
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView
 
 from crimsonslate_portfolio.forms import PortfolioAuthenticationForm
-from crimsonslate_portfolio.views.base import HtmxTemplateView, PortfolioProfileMixin
+from crimsonslate_portfolio.views.mixins import (
+    HtmxTemplateResponseMixin,
+    PortfolioProfileMixin,
+)
 
 
-class ContactView(PortfolioProfileMixin, HtmxTemplateView):
+class ContactView(PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView):
     content_type = "text/html"
     extra_context = {"title": "Contact"}
     http_method_names = ["get", "post"]
@@ -14,7 +18,7 @@ class ContactView(PortfolioProfileMixin, HtmxTemplateView):
     template_name = "portfolio/contact.html"
 
 
-class LoginView(LoginViewBase, HtmxTemplateView):
+class LoginView(HtmxTemplateResponseMixin, LoginViewBase):
     content_type = "text/html"
     extra_context = {"title": "Login"}
     form_class = PortfolioAuthenticationForm
@@ -25,7 +29,7 @@ class LoginView(LoginViewBase, HtmxTemplateView):
     template_name = "portfolio/login.html"
 
 
-class LogoutView(LogoutViewBase, HtmxTemplateView):
+class LogoutView(HtmxTemplateResponseMixin, LogoutViewBase):
     content_type = "text/html"
     extra_context = {"title": "Logout"}
     http_method_names = ["get", "post"]

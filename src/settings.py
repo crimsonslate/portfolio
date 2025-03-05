@@ -11,7 +11,6 @@ MEDIA_URL = "media/"
 DOCS_ROOT = BASE_DIR / "docs" / "build" / "html"
 ROOT_URLCONF = "src.urls"
 SECRET_KEY = "django-insecure-#ezlo7tqc&h07y4g^1i3jqg78^z*jgsyd11kq812^=k4%!lk6b"
-STATIC_ROOT = "/static/"
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 TIME_ZONE = "America/Chicago"

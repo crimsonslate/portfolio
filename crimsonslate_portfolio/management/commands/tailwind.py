@@ -2,34 +2,26 @@ import argparse
 import json
 import os
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 
 class Command(BaseCommand):
     help = "Runs the tailwind compiler"
 
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        self.input_filepath = (
-            "./crimsonslate_portfolio/static/crimsonslate_portfolio/css/input.css"
-        )
-        self.output_filepath = (
-            "./crimsonslate_portfolio/static/crimsonslate_portfolio/css/output.css"
-        )
-
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         """
         Adds subcommand arguments to the ``tailwind`` command.
 
-        +-------------+-------------------------------------------------------------------+
-        | Subcommand  | Action                                                            |
-        +=============+===================================================================+
-        | ``install`` | Installs the tailwind compiler for the project.                   |
-        +-------------+-------------------------------------------------------------------+
-        | ``start``   | Starts the tailwind compiler. Must be canceled with ``<CTRL>-c``. |
-        +-------------+-------------------------------------------------------------------+
-        | ``build``   | Builds the tailwind output file for production.                   |
-        +-------------+-------------------------------------------------------------------+
+        +-------------+------------------------------------------------------------------+
+        | Subcommand  | Action                                                           |
+        +=============+==================================================================+
+        | ``install`` | Installs the tailwind compiler for the project.                  |
+        +-------------+------------------------------------------------------------------+
+        | ``start``   | Starts the tailwind compiler. Can be canceled with ``<CTRL>-c``. |
+        +-------------+------------------------------------------------------------------+
+        | ``build``   | Builds the tailwind output file for production.                  |
+        +-------------+------------------------------------------------------------------+
 
         :param parser: An argument parser.
         :type parser: :py:obj:`argparse.ArgumentParser`
@@ -66,9 +58,9 @@ class Command(BaseCommand):
         :rtype: :py:obj:`str`
 
         """
-        command = (
-            f"npx @tailwindcss/cli -i {self.input_filepath} -o {self.output_filepath} "
-        )
+        input, output = self.get_input_filepath(), self.get_output_filepath()
+        command = f"npx @tailwindcss/cli -i {input} -o {output} "
+
         match subcommand:
             case "start":
                 styled = self.style.NOTICE
@@ -119,3 +111,11 @@ class Command(BaseCommand):
 
         """
         return name in self.get_node_dependencies()
+
+    def get_input_filepath(self) -> str:
+        """Returns the first input.css file found in ``BASE_DIR/css``"""
+        return list(settings.BASE_DIR.glob("**/css/input.css"))[0]
+
+    def get_output_filepath(self) -> str:
+        """Returns the first output.css file found in ``BASE_DIR/css``"""
+        return list(settings.BASE_DIR.glob("**/css/output.css"))[0]
