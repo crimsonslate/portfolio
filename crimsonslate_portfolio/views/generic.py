@@ -13,7 +13,7 @@ from crimsonslate_portfolio.views.mixins import (
 class ContactView(PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView):
     content_type = "text/html"
     extra_context = {"title": "Contact"}
-    http_method_names = ["get", "post"]
+    http_method_names = ["get"]
     partial_template_name = "portfolio/partials/_contact.html"
     template_name = "portfolio/contact.html"
 
