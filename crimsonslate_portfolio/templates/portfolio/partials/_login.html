@@ -3,11 +3,15 @@
     action="{% url 'login' %}"
     method="post"
 >
-    {{ form.non_field_errors }}
-    {{ form.errors }}
     {% csrf_token %}
-    {{ form.username }}
-    {{ form.password }}
+    <div class="flex flex-col gap-2">
+        {{ form.username }}
+        <span class="text-red-600">{{ form.username.errors }}</span>
+    </div>
+    <div class="flex flex-col gap-2">
+        {{ form.password }}
+        <span class="text-red-600">{{ form.password.errors }}</span>
+    </div>
     <input value="Login" type="submit" class="block w-full cursor-pointer rounded border-2 border-blue-600 bg-blue-500 p-2 text-gray-800 hover:bg-blue-200">
     <input class="hidden" type="hidden" id="next" value="{{ next }}">
 </form>

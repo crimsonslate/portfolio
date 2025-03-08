@@ -20,6 +20,7 @@ WSGI_APPLICATION = "src.wsgi.application"
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
 S3_UPLOAD_BUCKET_NAME = "crimsonslate-bucket"
 S3_UPLOAD_REGION = "us-east-1"
+LOGIN_REDIRECT_URL = "/gallery/"
 
 
 PORTFOLIO_PROFILE = {
