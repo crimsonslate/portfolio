@@ -29,7 +29,10 @@ class MediaUploadView(
     LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView
 ):
     http_method_names = ["get"]
-    extra_context = {"title": "Upload", "class": "bg-violet-300"}
+    extra_context = {
+        "title": "Upload",
+        "class": "bg-gray-100 m-4 p-4 rounded border border-gray-600",
+    }
     template_name = "portfolio/media/upload.html"
     partial_template_name = "portfolio/media/partials/_upload.html"
     login_url = reverse_lazy("login")
