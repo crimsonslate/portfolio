@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.forms import ModelForm
 
@@ -11,6 +12,15 @@ class PortfolioAuthenticationForm(AuthenticationForm):
             self.fields[name].widget.attrs.update(
                 {"class": "p-2 rounded bg-white", "placeholder": name.title()}
             )
+
+
+class MediaSearchForm(forms.Form):
+    q = forms.CharField(
+        max_length=64,
+        widget=forms.widgets.TextInput(
+            attrs={"class": "p-2 rounded bg-white", "placeholder": "Search..."}
+        ),
+    )
 
 
 class MediaCreateForm(ModelForm):

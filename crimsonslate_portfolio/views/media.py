@@ -1,4 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import QuerySet, Q
+from django.http import HttpRequest
 from django.urls import reverse_lazy
 from django.views.generic import (
     CreateView,
@@ -9,7 +11,11 @@ from django.views.generic import (
     ListView,
 )
 
-from crimsonslate_portfolio.forms import MediaCreateForm, MediaUpdateForm
+from crimsonslate_portfolio.forms import (
+    MediaCreateForm,
+    MediaSearchForm,
+    MediaUpdateForm,
+)
 from crimsonslate_portfolio.models import Media
 from crimsonslate_portfolio.views.mixins import (
     HtmxTemplateResponseMixin,
@@ -58,6 +64,7 @@ class MediaCreateView(HtmxTemplateResponseMixin, PortfolioProfileMixin, CreateVi
     model = Media
     partial_template_name = "portfolio/media/partials/_create.html"
     template_name = "portfolio/media/create.html"
+    success_url = reverse_lazy("upload success")
 
 
 class MediaUpdateView(
@@ -103,7 +110,14 @@ class MediaGalleryView(
     template_name = "portfolio/media/gallery.html"
 
 
-class MediaSearchView(
+class MediaSearchView(HtmxTemplateResponseMixin, PortfolioProfileMixin, TemplateView):
+    extra_context = {"title": "Search"}
+    http_method_names = ["get"]
+    partial_template_name = "portfolio/media/partials/_search.html"
+    template_name = "portfolio/media/search.html"
+
+
+class MediaSearchResultsView(
     HtmxTemplateResponseMixin,
     PortfolioMultipleObjectMixin,
     PortfolioProfileMixin,
@@ -113,8 +127,27 @@ class MediaSearchView(
     extra_context = {"title": "Search"}
     http_method_names = ["get"]
     model = Media
-    ordering = "name"
+    ordering = "title"
     paginate_by = 12
-    partial_template_name = "portfolio/media/partials/_search.html"
+    partial_template_name = "portfolio/media/partials/_search_results.html"
     queryset = Media.objects.all()
-    template_name = "portfolio/media/search.html"
+    template_name = "portfolio/media/search_results.html"
+    context_object_name = "search_results"
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        super().setup(request, *args, **kwargs)
+        query: str | None = request.GET.get("q")
+        form = MediaSearchForm({"q": query})
+        self.query = query if form.is_valid() else None
+
+    def get_queryset(self) -> QuerySet:
+        """Filters the queryset based on :py:attr:`query`, if it exists."""
+        queryset = super().get_queryset()
+        print(f"{self.query = }")
+        return (
+            queryset.filter(
+                Q(title__startswith=self.query) | Q(title__iexact=self.query)
+            )
+            if self.query
+            else queryset
+        )

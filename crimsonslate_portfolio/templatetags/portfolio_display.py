@@ -8,13 +8,16 @@ register = Library()
 
 
 @register.inclusion_tag("portfolio/media/display.html")
-def display(
-    media: Media, force_image: bool = False, css_class: str | None = None
+def media_display(
+    media: Media,
+    css_class: str | None = None,
+    force_image: bool = False,
 ) -> dict[str, Any]:
+    src = media.thumb.url if force_image and not media.is_image else media.source.url
     return {
         "title": media.title,
         "class": css_class,
         "image": force_image if force_image else media.is_image,
-        "src": media.source.url,
-        "detail_url": media.get_absolute_url(),
+        "src": src,
+        "link": media.get_absolute_url(),
     }

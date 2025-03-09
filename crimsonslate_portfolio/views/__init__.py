@@ -8,4 +8,10 @@ from .media import (
     MediaUpdateView,
     MediaUploadView,
     MediaUploadSuccessView,
+    MediaSearchResultsView,
+)
+from .tags import (
+    TagCreateView,
+    TagDeleteView,
+    TagUpdateView,
 )
