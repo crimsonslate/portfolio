@@ -143,7 +143,6 @@ class MediaSearchResultsView(
     def get_queryset(self) -> QuerySet:
         """Filters the queryset based on :py:attr:`query`, if it exists."""
         queryset = super().get_queryset()
-        print(f"{self.query = }")
         return (
             queryset.filter(
                 Q(title__startswith=self.query) | Q(title__iexact=self.query)
