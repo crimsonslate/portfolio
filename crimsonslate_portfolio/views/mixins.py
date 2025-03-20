@@ -2,10 +2,7 @@ from typing import Any
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import QuerySet
 from django.views.generic.base import ContextMixin, TemplateResponseMixin
-from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.list import MultipleObjectMixin
 
 if not hasattr(settings, "PORTFOLIO_PROFILE"):
     raise ImproperlyConfigured("'PORTFOLIO_PROFILE' setting is required.")
@@ -46,23 +43,3 @@ class PortfolioProfileMixin(ContextMixin):
         context: dict[str, Any] = super().get_context_data(**kwargs)
         context["profile"] = settings.PORTFOLIO_PROFILE
         return context
-
-
-class PortfolioSingleObjectMixin(SingleObjectMixin):
-    def get_queryset(self) -> QuerySet:
-        queryset = super().get_queryset()
-
-        user = self.request.user if hasattr(self, "request") else None
-        if not user or not user.is_staff:
-            return queryset.exclude(is_hidden=True)
-        return queryset
-
-
-class PortfolioMultipleObjectMixin(MultipleObjectMixin):
-    def get_queryset(self) -> QuerySet:
-        queryset = super().get_queryset()
-
-        user = self.request.user if hasattr(self, "request") else None
-        if not user or not user.is_staff:
-            return queryset.exclude(is_hidden=True)
-        return queryset

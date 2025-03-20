@@ -1,6 +1,5 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from django.forms import ModelForm
 
 from crimsonslate_portfolio.models import Media
 
@@ -23,12 +22,11 @@ class MediaSearchForm(forms.Form):
     )
 
 
-class MediaCreateForm(ModelForm):
+class MediaCreateForm(forms.ModelForm):
     class Meta:
         model = Media
         fields = [
             "source",
-            "thumb",
             "title",
             "subtitle",
             "desc",
@@ -44,12 +42,11 @@ class MediaCreateForm(ModelForm):
             self.fields[name].widget.attrs.update({"class": self.field_class})
 
 
-class MediaUpdateForm(ModelForm):
+class MediaUpdateForm(forms.ModelForm):
     class Meta:
         model = Media
         fields = [
             "source",
-            "thumb",
             "title",
             "subtitle",
             "desc",
@@ -57,3 +54,9 @@ class MediaUpdateForm(ModelForm):
             "tags",
             "date_created",
         ]
+
+    def __init__(self, field_class: str | None = None, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.field_class = field_class or "p-2 bg-white rounded border border-gray-600"
+        for name in self.fields.keys():
+            self.fields[name].widget.attrs.update({"class": self.field_class})

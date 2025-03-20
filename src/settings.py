@@ -18,9 +18,14 @@ USE_I18N = True
 USE_TZ = True
 WSGI_APPLICATION = "src.wsgi.application"
 SILENCED_SYSTEM_CHECKS = ["staticfiles.W004"]
-S3_UPLOAD_BUCKET_NAME = "crimsonslate-bucket"
-S3_UPLOAD_REGION = "us-east-1"
 LOGIN_REDIRECT_URL = "/gallery/"
+
+THUMBNAIL_ALIASES = {
+    "": {
+        "gallery": {"size": (96, 96), "crop": True},
+        "search_result": {"size": (48, 48), "crop": True},
+    }
+}
 
 
 PORTFOLIO_PROFILE = {
@@ -82,16 +87,15 @@ STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
-    "bucket": {
-        "BACKEND": "storages.backends.s3.S3Storage",
-        "OPTIONS": {
-            "location": "media/",
-            "bucket_name": S3_UPLOAD_BUCKET_NAME,
-            "region_name": S3_UPLOAD_REGION,
-            "verify": False,
-        },
-    },
 }
+
+THUMBNAIL_PROCESSORS = (
+    "easy_thumbnails.processors.colorspace",
+    "easy_thumbnails.processors.autocrop",
+    "easy_thumbnails.processors.scale_and_crop",
+    # "easy_thumbnails.processors.scale_and_crop_with_subject_location",
+    "easy_thumbnails.processors.filters",
+)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -102,10 +106,15 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.forms",
-    "django_browser_reload",
+    "easy_thumbnails",
+    "filer",
     "docs",
     "crimsonslate_portfolio.apps.CrimsonslatePortfolioConfig",
 ]
+
+if DEBUG:
+    INSTALLED_APPS.append("django_browser_reload")
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

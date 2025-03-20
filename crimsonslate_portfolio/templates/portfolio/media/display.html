@@ -1,5 +1,8 @@
-{% if image %}
-<img class="{{ class }}" src="{{ src }}" alt="{{ title }}">
+{% if as_image and is_image %}
+    <img class="{{ class }}" src="{{ src }}" alt="{{ alttext }}">
+{% elif as_image and not is_image %}
+    {% load thumbnail %}
+    <img class="{{ class }}" src="{{ src|thumbnail_url:'gallery' }}" alt="{{ alttext }}">
 {% else %}
 <video class="{{ class }}" controls>
     <span class="sr-only">{{ title }}</span>

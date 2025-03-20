@@ -13,17 +13,7 @@ urlpatterns = [
     path(
         "search/results/", views.MediaSearchResultsView.as_view(), name="search results"
     ),
-    path("upload/", views.MediaUploadView.as_view(), name="upload media"),
-    path(
-        "upload/success/", views.MediaUploadSuccessView.as_view(), name="upload success"
-    ),
-    path("media/create/", views.MediaCreateView.as_view(), name="create media"),
     path("<str:slug>/", views.MediaDetailView.as_view(), name="detail media"),
-    path("<str:slug>/delete/", views.MediaDeleteView.as_view(), name="delete media"),
-    path("<str:slug>/update/", views.MediaUpdateView.as_view(), name="update media"),
-    path("tags/create/", views.TagCreateView.as_view(), name="create tag"),
-    path("tags/<int:pk>/update/", views.TagUpdateView.as_view(), name="update tag"),
-    path("tags/<int:pk>/delete/", views.TagDeleteView.as_view(), name="delete tag"),
 ]
 
 if settings.DEBUG:

@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.template import Library
+from easy_thumbnails.files import get_thumbnailer
 
 from crimsonslate_portfolio.models import Media
 
@@ -12,12 +13,13 @@ def media_display(
     media: Media,
     css_class: str | None = None,
     force_image: bool = False,
+    alias: str = "gallery",
 ) -> dict[str, Any]:
-    src = media.thumb.url if force_image and not media.is_image else media.source.url
+    options = {"size": (100, 100), "crop": True}
     return {
-        "title": media.title,
-        "class": css_class,
         "image": force_image if force_image else media.is_image,
-        "src": src,
-        "link": media.get_absolute_url(),
+        "class": css_class,
+        "src": get_thumbnailer(media.source).get_thumbnail(options)
+        if force_image and not media.is_image
+        else media.source.url,
     }

@@ -1,109 +1,32 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import QuerySet, Q
-from django.http import HttpRequest
-from django.urls import reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    TemplateView,
-    UpdateView,
-    ListView,
-)
+from typing import Any
 
-from crimsonslate_portfolio.forms import (
-    MediaCreateForm,
-    MediaSearchForm,
-    MediaUpdateForm,
-)
-from crimsonslate_portfolio.models import Media
+from django.db.models import QuerySet, Q
+from django.views.generic import DetailView, TemplateView, ListView
+
+from crimsonslate_portfolio.forms import MediaSearchForm
+from crimsonslate_portfolio.models import Media, MediaTag
 from crimsonslate_portfolio.views.mixins import (
     HtmxTemplateResponseMixin,
     PortfolioProfileMixin,
-    PortfolioSingleObjectMixin,
-    PortfolioMultipleObjectMixin,
 )
 
 
-class MediaUploadView(
-    LoginRequiredMixin, PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView
-):
-    http_method_names = ["get"]
-    extra_context = {
-        "title": "Upload",
-        "class": "bg-gray-100 m-4 p-4 rounded border border-gray-600",
-    }
-    template_name = "portfolio/media/upload.html"
-    partial_template_name = "portfolio/media/partials/_upload.html"
-    login_url = reverse_lazy("login")
-    raise_exception = False
-    permission_denied_message = "Please login and try again."
-
-
-class MediaUploadSuccessView(
-    HtmxTemplateResponseMixin, PortfolioProfileMixin, TemplateView
-):
-    http_method_names = ["get"]
-    extra_context = {"title": "Success", "class": ""}
-    template_name = "portfolio/media/upload_success.html"
-    partial_template_name = "portfolio/media/partials/_upload_success.html"
-
-
-class MediaDeleteView(
-    HtmxTemplateResponseMixin,
-    PortfolioSingleObjectMixin,
-    PortfolioProfileMixin,
-    DeleteView,
-):
-    model = Media
-    template_name = "portfolio/media/delete.html"
-    partial_template_name = "portfolio/media/partials/_delete.html"
-    http_method_names = ["get", "post"]
-
-
-class MediaCreateView(HtmxTemplateResponseMixin, PortfolioProfileMixin, CreateView):
-    form_class = MediaCreateForm
-    http_method_names = ["get", "post"]
-    model = Media
-    partial_template_name = "portfolio/media/partials/_create.html"
-    template_name = "portfolio/media/create.html"
-    success_url = reverse_lazy("upload success")
-
-
-class MediaUpdateView(
-    HtmxTemplateResponseMixin,
-    PortfolioSingleObjectMixin,
-    PortfolioProfileMixin,
-    UpdateView,
-):
-    form_class = MediaUpdateForm
-    http_method_names = ["get", "post"]
-    model = Media
-    partial_template_name = "portfolio/media/partials/_update.html"
-    template_name = "portfolio/media/update.html"
-
-
-class MediaDetailView(
-    HtmxTemplateResponseMixin,
-    PortfolioSingleObjectMixin,
-    PortfolioProfileMixin,
-    DetailView,
-):
+class MediaDetailView(HtmxTemplateResponseMixin, PortfolioProfileMixin, DetailView):
     http_method_names = ["get"]
     model = Media
     partial_template_name = "portfolio/media/partials/_detail.html"
     queryset = Media.objects.all()
     template_name = "portfolio/media/detail.html"
 
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context: dict[str, Any] = super().get_context_data(**kwargs)
+        context["title"] = self.get_object().title
+        return context
 
-class MediaGalleryView(
-    HtmxTemplateResponseMixin,
-    PortfolioMultipleObjectMixin,
-    PortfolioProfileMixin,
-    ListView,
-):
+
+class MediaGalleryView(HtmxTemplateResponseMixin, PortfolioProfileMixin, ListView):
     allow_empty = True
-    extra_context = {"title": "Gallery"}
+    extra_context = {"title": "Gallery", "tags": MediaTag.objects.all()}
     http_method_names = ["get"]
     model = Media
     ordering = "date_created"
@@ -114,7 +37,7 @@ class MediaGalleryView(
 
 
 class MediaSearchView(HtmxTemplateResponseMixin, PortfolioProfileMixin, TemplateView):
-    extra_context = {"title": "Search"}
+    extra_context = {"title": "Search", "tags": MediaTag.objects.all()}
     http_method_names = ["get"]
     partial_template_name = "portfolio/media/partials/_search.html"
     template_name = "portfolio/media/search.html"
@@ -122,12 +45,11 @@ class MediaSearchView(HtmxTemplateResponseMixin, PortfolioProfileMixin, Template
 
 class MediaSearchResultsView(
     HtmxTemplateResponseMixin,
-    PortfolioMultipleObjectMixin,
     PortfolioProfileMixin,
     ListView,
 ):
     allow_empty = True
-    extra_context = {"title": "Search"}
+    extra_context = {"title": "Search", "tags": MediaTag.objects.all()}
     http_method_names = ["get"]
     model = Media
     ordering = "title"
@@ -137,19 +59,14 @@ class MediaSearchResultsView(
     template_name = "portfolio/media/search_results.html"
     context_object_name = "search_results"
 
-    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        super().setup(request, *args, **kwargs)
-        query: str | None = request.GET.get("q")
-        form = MediaSearchForm({"q": query})
-        self.query = query if form.is_valid() else None
-
     def get_queryset(self) -> QuerySet:
-        """Filters the queryset based on :py:attr:`query`, if it exists."""
-        queryset = super().get_queryset()
+        """Filters the queryset based on a query in an HTML request body."""
+        queryset: QuerySet = super().get_queryset()
+        form: MediaSearchForm = MediaSearchForm({"q": self.request.GET.get("q")})
+        query: str | None = form.cleaned_data["q"] if form.is_valid() else None
+
         return (
-            queryset.filter(
-                Q(title__startswith=self.query) | Q(title__iexact=self.query)
-            )
-            if self.query
+            queryset.filter(Q(title__startswith=query) | Q(title__iexact=query))
+            if query is not None
             else queryset
         )
