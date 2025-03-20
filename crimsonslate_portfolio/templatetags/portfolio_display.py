@@ -10,12 +10,9 @@ register = Library()
 
 @register.inclusion_tag("portfolio/media/display.html")
 def media_display(
-    media: Media,
-    css_class: str | None = None,
-    force_image: bool = False,
-    alias: str = "gallery",
+    media: Media, css_class: str | None = None, force_image: bool = False
 ) -> dict[str, Any]:
-    options = {"size": (100, 100), "crop": True}
+    options: dict[str, tuple[int, int] | bool] = {"size": (100, 100), "crop": True}
     return {
         "image": force_image if force_image else media.is_image,
         "class": css_class,

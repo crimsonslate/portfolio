@@ -10,7 +10,7 @@ from crimsonslate_portfolio.views.mixins import (
 )
 
 
-class ContactView(PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView):
+class ContactView(HtmxTemplateResponseMixin, PortfolioProfileMixin, TemplateView):
     content_type = "text/html"
     extra_context = {"title": "Contact"}
     http_method_names = ["get"]
@@ -18,7 +18,7 @@ class ContactView(PortfolioProfileMixin, HtmxTemplateResponseMixin, TemplateView
     template_name = "portfolio/contact.html"
 
 
-class LoginView(HtmxTemplateResponseMixin, LoginViewBase):
+class LoginView(HtmxTemplateResponseMixin, PortfolioProfileMixin, LoginViewBase):
     content_type = "text/html"
     extra_context = {"title": "Login"}
     form_class = PortfolioAuthenticationForm
@@ -29,7 +29,7 @@ class LoginView(HtmxTemplateResponseMixin, LoginViewBase):
     template_name = "portfolio/login.html"
 
 
-class LogoutView(HtmxTemplateResponseMixin, LogoutViewBase):
+class LogoutView(HtmxTemplateResponseMixin, PortfolioProfileMixin, LogoutViewBase):
     content_type = "text/html"
     extra_context = {"title": "Logout"}
     http_method_names = ["get", "post"]

@@ -44,9 +44,7 @@ class MediaSearchView(HtmxTemplateResponseMixin, PortfolioProfileMixin, Template
 
 
 class MediaSearchResultsView(
-    HtmxTemplateResponseMixin,
-    PortfolioProfileMixin,
-    ListView,
+    HtmxTemplateResponseMixin, PortfolioProfileMixin, ListView
 ):
     allow_empty = True
     extra_context = {"title": "Search", "tags": MediaTag.objects.all()}
@@ -61,7 +59,7 @@ class MediaSearchResultsView(
 
     def get_queryset(self) -> QuerySet:
         """Filters the queryset based on a query in an HTML request body."""
-        queryset: QuerySet = super().get_queryset()
+        queryset: QuerySet[Media, Media | None] = super().get_queryset()
         form: MediaSearchForm = MediaSearchForm({"q": self.request.GET.get("q")})
         query: str | None = form.cleaned_data["q"] if form.is_valid() else None
 

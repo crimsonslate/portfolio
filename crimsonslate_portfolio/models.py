@@ -7,7 +7,6 @@ from django.utils import timezone
 from django.utils.text import slugify
 
 from filer.fields.file import FilerFileField
-from filer.fields.image import FilerImageField
 
 from crimsonslate_portfolio.validators import validate_emoji
 
@@ -18,7 +17,7 @@ class MediaTag(models.Model):
     name = models.CharField(max_length=64)
     """A name for the tag."""
     emoji = models.CharField(
-        max_length=128,
+        max_length=256,
         null=True,
         blank=True,
         default=None,
@@ -35,7 +34,7 @@ class MediaTag(models.Model):
         return str(self.name)
 
     def save(self, **kwargs) -> None:
-        """Encodes :py:attr:`emoji` before writing it into the database."""
+        """Encodes :py:attr:`emoji` before writing it to database."""
         if self.emoji:
             val = e.emojize(self.emoji)
             self.emoji = e.demojize(val) if e.is_emoji(val) else None
@@ -73,7 +72,9 @@ class Media(models.Model):
     """Whether or not the media is hidden."""
     is_image = models.BooleanField(blank=True, null=True, editable=False)
     """Whether or not the media is an image."""
-    tags = models.ManyToManyField("MediaTag", default=None, blank=True)
+    tags = models.ManyToManyField(
+        "crimsonslate_portfolio.MediaTag", default=None, blank=True
+    )
     """Tags assigned to the media."""
 
     date_created = models.DateTimeField(default=timezone.now)
@@ -81,16 +82,8 @@ class Media(models.Model):
     date_published = models.DateTimeField(default=timezone.now, editable=False)
     """Date and time the media was published."""
 
-    class Meta:
-        ordering = ["-date_created"]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["title", "slug"],
-                name="%(app_label)s_%(class)s_unique_title_and_slug",
-            )
-        ]
-
     def __str__(self) -> str:
+        """Returns the media title."""
         return str(self.title)
 
     def save(self, **kwargs) -> None:
