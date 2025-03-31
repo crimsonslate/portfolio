@@ -7,7 +7,7 @@ from .models import Media, MediaTag
 class MediaAdmin(admin.ModelAdmin):
     date_hierarchy = "date_created"
     fieldsets = [
-        ("Files", {"fields": ["source", "thumb"]}),
+        (None, {"fields": ["source"]}),
         ("Data", {"fields": ["title", "subtitle", "desc", "slug", "is_image", "tags"]}),
         ("Dates", {"fields": ["date_created", "date_published"]}),
         ("Settings", {"fields": ["is_hidden"]}),

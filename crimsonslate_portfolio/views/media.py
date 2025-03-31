@@ -1,7 +1,7 @@
 from typing import Any
 
-from django.db.models import QuerySet, Q
-from django.views.generic import DetailView, TemplateView, ListView
+from django.db.models import Q, QuerySet
+from django.views.generic import DetailView, ListView, TemplateView
 
 from crimsonslate_portfolio.forms import MediaSearchForm
 from crimsonslate_portfolio.models import Media, MediaTag
@@ -32,7 +32,6 @@ class MediaGalleryView(HtmxTemplateResponseMixin, PortfolioProfileMixin, ListVie
     ordering = "date_created"
     paginate_by = 12
     partial_template_name = "portfolio/media/partials/_gallery.html"
-    queryset = Media.objects.all()
     template_name = "portfolio/media/gallery.html"
 
 
@@ -47,13 +46,12 @@ class MediaSearchResultsView(
     HtmxTemplateResponseMixin, PortfolioProfileMixin, ListView
 ):
     allow_empty = True
-    extra_context = {"title": "Search", "tags": MediaTag.objects.all()}
+    extra_context = {"title": "Results", "tags": MediaTag.objects.all()}
     http_method_names = ["get"]
     model = Media
     ordering = "title"
     paginate_by = 12
     partial_template_name = "portfolio/media/partials/_search_results.html"
-    queryset = Media.objects.all()
     template_name = "portfolio/media/search_results.html"
     context_object_name = "search_results"
 

@@ -9,7 +9,7 @@ crimsonslate-portfolio documentation
 .. toctree::
     :maxdepth: 2
     :caption: Contents
-
-    models/index.rst
-    templatetags/index.rst
-    views/index.rst
+    
+    models.rst
+    settings.rst
+    views.rst
